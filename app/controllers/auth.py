@@ -56,7 +56,7 @@ class RegisterAPI(MethodView):
             return make_response(jsonify(responseObject)), 202
 
     def get(self):
-        return render_template('/auth/')
+        return "ok"
 
 class LoginAPI(MethodView):
     """

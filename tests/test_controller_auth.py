@@ -27,6 +27,14 @@ def login_user(self, email, password):
         content_type='application/json',
     )
 
+def logout_user(self, data):
+    return self.client.post(
+                '/auth/logout',
+                headers=dict(
+                    Authorization='Bearer ' + json.loads(data)['auth_token']
+                )
+            )
+    
 
 class TestAuthBlueprint(BaseTestCase):
 
@@ -147,14 +155,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 200)
             # valid token logout
-            response = self.client.post(
-                '/auth/logout',
-                headers=dict(
-                    Authorization='Bearer ' + json.loads(
-                        resp_login.data.decode()
-                    )['auth_token']
-                )
-            )
+            response = logout_user(self, resp_login.data.decode())
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['message'] == 'Successfully logged out.')
@@ -181,15 +182,8 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 200)
             # invalid token logout
-            time.sleep(6)
-            response = self.client.post(
-                '/auth/logout',
-                headers=dict(
-                    Authorization='Bearer ' + json.loads(
-                        resp_login.data.decode()
-                    )['auth_token']
-                )
-            )
+            time.sleep(2)
+            response = logout_user(self, resp_login.data.decode())
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
             self.assertTrue(

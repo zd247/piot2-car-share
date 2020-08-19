@@ -24,5 +24,8 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app) 
 
 from app.controllers.auth import auth_blueprint
+from app.controllers.cars import cars_blueprint
+
 # register controller blueprints
 app.register_blueprint(auth_blueprint)
+app.register_blueprint(cars_blueprint)
