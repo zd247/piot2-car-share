@@ -72,7 +72,24 @@ class TestCarBlueprint(BaseTestCase):
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 201)
             
-            
+    def test_edit_existing (self):
+        """ Test put method on existing database unit """
+
+        with self.client: 
+            response = self.client.put (
+                '/cars/Honda',
+                data = json.dumps(dict(
+                    name='Honda',
+                    make='Test',
+                    body='Test',
+                    colour='Test',
+                    seats=4,
+                    location='Test',
+                    cost_per_hour=17.5,
+                    manu_date='2018-12-19 09:26:03.478039',
+                )),
+                content_type = 'application/json'
+            )
             
             
             

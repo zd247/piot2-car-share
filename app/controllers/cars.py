@@ -17,6 +17,8 @@ def new_car_dict(self, car):
         'cost_per_hour': car.cost_per_hour,
         'manu_date': car.manu_date
     }
+    
+    
 
 class RestfulAPI (MethodView):
     """
@@ -103,9 +105,37 @@ class RestfulAPI (MethodView):
             return make_response(jsonify(responseObject)), 500
             
             
-
-    def put(self, entity):
+    def put(self, car_name):
         """ Responds to PUT requests """
+        try:
+            put_data = request.get_json()
+            
+            query_car = Car.query.filter_by(
+                name = car_name
+            ).first()
+            
+            if query_car:
+                query_car.name = put_data.get('name')
+                query_car.body = put_data.get('body')
+                query_car.make = put_data.get('make')
+                query_car.colour = put_data.get('colour')
+                query_car.seats = put_data.get('seats')
+                query_car.location = put_data.get('location')
+                query_car.cost_per_hour = put_data.get('cost_per_hour')
+                query_car.manu_date = put_data.get('manu_date')
+                
+                
+                
+        except Exception as e:
+            print(e)
+            responseObject = {
+                'status': 'fail',
+                'message': 'Try again'
+            }
+            return make_response(jsonify(responseObject)), 500  
+            
+                
+                
         return "Responding to a PUT request"
 
     def patch(self, entity):
