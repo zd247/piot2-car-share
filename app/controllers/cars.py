@@ -124,7 +124,7 @@ class RestfulAPI (MethodView):
                 query_car.cost_per_hour = put_data.get('cost_per_hour')
                 query_car.manu_date = put_data.get('manu_date')
                 
-                
+            return "Responding to a PUT request"
                 
         except Exception as e:
             print(e)
@@ -134,9 +134,8 @@ class RestfulAPI (MethodView):
             }
             return make_response(jsonify(responseObject)), 500  
             
-                
-                
-        return "Responding to a PUT request"
+            
+       
 
     def patch(self, entity):
         """ Responds to PATCH requests """
