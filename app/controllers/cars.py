@@ -97,6 +97,7 @@ class RestfulAPI (MethodView):
                 }
                 return make_response(jsonify(responseObject), 401)
         except Exception as e:
+            print ("EXCEPTION ERROR DEBUG")
             print(e)
             responseObject = {
                 'status': 'fail',
@@ -106,15 +107,20 @@ class RestfulAPI (MethodView):
             
             
     def put(self, car_name):
-        """ Responds to PUT requests """
+        """ Responds to PUT requests
+            Request body must contain all fields    
+        """    
         try:
             put_data = request.get_json()
             
-            query_car = Car.query.filter_by(
-                name = car_name
-            ).first()
             
-            if query_car:
+            # query the car from the params
+            query_car = Car.query.filter_by(name = car_name).first()
+            
+
+            # modify the queried car with the request body
+            if query_car is not None:
+                print (query_car)
                 query_car.name = put_data.get('name')
                 query_car.body = put_data.get('body')
                 query_car.make = put_data.get('make')
@@ -124,27 +130,79 @@ class RestfulAPI (MethodView):
                 query_car.cost_per_hour = put_data.get('cost_per_hour')
                 query_car.manu_date = put_data.get('manu_date')
                 
-            return "Responding to a PUT request"
+                db.session.commit()
                 
+                updated_car = new_car_dict(self,query_car)
+                
+                responseObject = {
+                    "status": 'success',
+                    'message': 'Updated a car successfully',
+                    'data': updated_car
+                }
+                
+                return make_response(jsonify(responseObject),200)
+                
+            else:
+                responseObject = {
+                    'status': 'fail',
+                    'message': 'Cannot find the car name in query'
+                }
+                
+                return make_response(jsonify(responseObject)), 500
+                
+            # Car.objects.get(name=car_name).update(**put_data)
         except Exception as e:
+            print ("EXCEPTION ERROR DEBUG")
             print(e)
             responseObject = {
                 'status': 'fail',
                 'message': 'Try again'
             }
-            return make_response(jsonify(responseObject)), 500  
+            return make_response(jsonify(responseObject), 500) 
             
+
+    def delete(self, car_name):
+        """ Responds to DELETE requests """    
+        if car_name:
+            try:
+                # query the car from the params
+                query_car = Car.query.filter_by(name = car_name).first()
+                
+
+                # modify the queried car with the request body
+                if query_car is not None:
+                    db.session.delete(query_car)
+                    db.session.commit()
+                    
+                    responseObject = {
+                        'status': 'deleted',
+                        'message': 'Successfully deleted a car Record'
+                    }
+                    
+                    return make_response(jsonify(responseObject)), 200
+                    
+                else:
+                    responseObject = {
+                        'status': 'fail',
+                        'message': 'Cannot find the car name in query'
+                    }
+                    
+                    return make_response(jsonify(responseObject)), 500
+                    
+                # Car.objects.get(name=car_name).update(**put_data)
+            except Exception as e:
+                print(e)
+                responseObject = {
+                    'status': 'fail',
+                    'message': 'Try again'
+                }
+                return make_response(jsonify(responseObject), 500)  
             
+           
        
-
-    def patch(self, entity):
-        """ Responds to PATCH requests """
-        return "Responding to a PATCH request"
-
-    def delete(self, entity):
-        """ Responds to DELETE requests """
-        return "Responding to a DELETE request"
+           
     
+            
     
     
 

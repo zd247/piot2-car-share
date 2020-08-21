@@ -64,7 +64,7 @@ class TestCarBlueprint(BaseTestCase):
             )
             
             data  = json.loads(response.data.decode())
-            print (data)
+            
             self.assertTrue(data is not None)
             self.assertEqual(data['data']['name'], 'Test')
             self.assertEqual(data['data']['make'], 'Test')
@@ -74,8 +74,17 @@ class TestCarBlueprint(BaseTestCase):
             
     def test_edit_existing (self):
         """ Test put method on existing database unit """
-
+        seed_car(self)
+        
+        assert_car1 = db.session.query(Car).filter_by(name='Honda').first()
+        assert_car2 = db.session.query(Car).filter_by(name='Subaru').first()
+        
+        self.assertTrue(assert_car1 is not None)
+        self.assertTrue(assert_car2 is not None)
+        
+        
         with self.client: 
+            # invoke put request to client with new body being passed
             response = self.client.put (
                 '/cars/Honda',
                 data = json.dumps(dict(
@@ -83,13 +92,48 @@ class TestCarBlueprint(BaseTestCase):
                     make='Test',
                     body='Test',
                     colour='Test',
-                    seats=4,
+                    seats=7,
                     location='Test',
-                    cost_per_hour=17.5,
+                    cost_per_hour=12.5,
                     manu_date='2018-12-19 09:26:03.478039',
                 )),
                 content_type = 'application/json'
             )
+        
             
+            data = json.loads(response.data.decode())
+            
+            # test the response object and status
+            self.assertTrue(data is not None)
+            self.assertEqual(data['data']['name'], 'Honda')
+            self.assertEqual(data['data']['make'], 'Test')
+            self.assertEqual(data['data']['seats'], 7)
+            self.assertEqual(data['data']['cost_per_hour'], 12.5)
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 200)
+            
+            
+    def test_delete_existing(self):
+        """ Test delete method on an existing Car record """
+        
+        seed_car(self)
+        
+        assert_car1 = db.session.query(Car).filter_by(name='Honda').first()
+        assert_car2 = db.session.query(Car).filter_by(name='Subaru').first()
+        
+        self.assertTrue(assert_car1 is not None)
+        self.assertTrue(assert_car2 is not None)
+        
+        with self.client:
+            response = self.client.delete(
+                '/cars/Honda'
+            )
+            
+            query_car = db.session.query(Car).filter_by(name='Honda').first()
+            
+        
+            self.assertFalse(query_car)
+            self.assertEqual(response.status_code, 200)
+        
             
             
