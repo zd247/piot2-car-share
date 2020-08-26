@@ -12,15 +12,13 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
-    admin = db.Column(db.Boolean, nullable=False, default=False)
 
-    def __init__(self, email, password, admin=False):
+    def __init__(self, email, password):
         self.email = email
         self.password = bcrypt.generate_password_hash(
             password, app.config.get('BCRYPT_LOG_ROUNDS')
         ).decode()
         self.registered_on = datetime.datetime.now()
-        self.admin = admin
 
     def encode_auth_token(self, user_id):
         """
@@ -54,6 +52,7 @@ class User(db.Model):
             if is_blacklisted_token:
                 return 'Token blacklisted. Please log in again.'
             else:
+                # return the subscriber accessing the jwt token
                 return payload['sub']
         except jwt.ExpiredSignatureError:
             return 'Signature expired. Please log in again.'

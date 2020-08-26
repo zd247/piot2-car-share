@@ -114,7 +114,6 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['data'] is not None)
             self.assertTrue(data['data']['email'] == 'joe@gmail.com')
-            self.assertTrue(data['data']['admin'] == 'true' or 'false')
             self.assertEqual(response.status_code, 200)
 
     def test_user_status_malformed_bearer_token(self):

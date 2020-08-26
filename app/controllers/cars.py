@@ -198,13 +198,6 @@ class RestfulAPI (MethodView):
                 }
                 return make_response(jsonify(responseObject), 500)  
             
-           
-       
-           
-    
-            
-    
-    
 
 restful_view = RestfulAPI.as_view('restful_api')
 
