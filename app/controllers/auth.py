@@ -1,8 +1,12 @@
+import numpy as np
+
 from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
 from app import bcrypt, db
-from app.models.user import User, BlacklistToken
+from app.models.user import User, BlacklistToken, Role
+
+import json
 
 # Pluggable class-based views
 
@@ -25,8 +29,14 @@ class RegisterAPI(MethodView):
             try:
                 user = User(
                     email=post_data.get('email'),
-                    password=post_data.get('password')
+                    password=post_data.get('password'),
+                    first_name = post_data.get('first_name'),
+                    last_name = post_data.get('last_name')
                 )
+                
+                if post_data.get('role') is not None:
+                    user.roles.append(Role(name=post_data.get('role')))
+                    
                 # insert the user to database
                 db.session.add(user)
                 db.session.commit()
@@ -34,11 +44,21 @@ class RegisterAPI(MethodView):
                 # generate the auth token
                 auth_token = user.encode_auth_token(user.id)
                 
+                roles = json.dumps(user.roles, cls=AlchemyEncoder)
+                
                 # construct res message
                 responseObject = {
                     'status': 'success',
                     'message': 'Successfully registered.',
-                    'auth_token': auth_token.decode()
+                    'auth_token': auth_token.decode(),
+                    'data': {
+                        'user_id': user.id,
+                        'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'roles' : roles,
+                        'registered_on': user.registered_on
+                    }
                 }
                 
                 return make_response(jsonify(responseObject)), 201
@@ -120,11 +140,17 @@ class UserAPI(MethodView):
             resp = User.decode_auth_token(auth_token)
             if not isinstance(resp, str):
                 user = User.query.filter_by(id=resp).first()
+                
+                roles = json.dumps(user.roles, cls=AlchemyEncoder)
+                
                 responseObject = {
                     'status': 'success',
                     'data': {
                         'user_id': user.id,
                         'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'roles': roles,
                         'registered_on': user.registered_on
                     }
                 }
@@ -153,6 +179,8 @@ class LogoutAPI(MethodView):
             auth_token = auth_header.split(" ")[1]
         else:
             auth_token = ''
+            
+            
         if auth_token:
             resp = User.decode_auth_token(auth_token)
             if not isinstance(resp, str):
@@ -213,3 +241,26 @@ auth_blueprint.add_url_rule(
     view_func=logout_view,
     methods=['POST']
 )
+
+
+# ========================[External]=======================
+
+from sqlalchemy.ext.declarative import DeclarativeMeta
+
+class AlchemyEncoder(json.JSONEncoder):
+    
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+
+        return json.JSONEncoder.default(self, obj)
