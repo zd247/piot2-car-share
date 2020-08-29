@@ -36,6 +36,8 @@ class RegisterAPI(MethodView):
                 
                 if post_data.get('role') is not None:
                     user.roles.append(Role(name=post_data.get('role')))
+                else:
+                    user.roles.append(Role(name='Customer'))
                     
                 # insert the user to database
                 db.session.add(user)

@@ -11,6 +11,7 @@ In PostgreSQL or database of choice, create 2 tables for test and development
 
 `create database piot2-test;`
 
+### Database Migration
 
 `python3 manage.py create_db`
 

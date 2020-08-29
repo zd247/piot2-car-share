@@ -60,6 +60,7 @@ class TestUserModel(BaseTestCase):
                 last_name="Snow"
             )
             user.roles.append(Role(name='Customer'))
+            #TODO: can append more roles but not in this bussiness model not advisable
             
             db.session.add(user)
             db.session.commit()

@@ -44,10 +44,14 @@ class TestAuthBlueprint(BaseTestCase):
     def test_registration(self):
         """ Test for user registration without roles"""
         with self.client:
-            response = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
+            response = register_user(self, 'joe@gmail.com', '123456', "John", "Doe")
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['message'] == 'Successfully registered.')
+            
+            role_data = json.loads(data['data']['roles'])
+            self.assertTrue(role_data[0]['name'] == 'Customer')
+            
             self.assertTrue(data['auth_token'])
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 201)
@@ -55,14 +59,14 @@ class TestAuthBlueprint(BaseTestCase):
     def test_registration_with_roles(self):
         """ Test for user registration with roles"""
         with self.client:
-            response = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe", role='Customer')
+            response = register_user(self, 'joe@gmail.com', '123456', "John", "Doe", role='Manager')
             data = json.loads(response.data.decode())
             
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['message'] == 'Successfully registered.')
             
             role_data = json.loads(data['data']['roles'])
-            self.assertTrue(role_data[0]['name'] == 'Customer')
+            self.assertTrue(role_data[0]['name'] == 'Manager')
             
             self.assertTrue(data['auth_token'])
             self.assertTrue(response.content_type == 'application/json')
