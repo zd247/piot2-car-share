@@ -6,6 +6,9 @@ from flask.views import MethodView
 from app import bcrypt, db
 from app.models.user import User, BlacklistToken, Role
 
+from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
+
+
 import json
 
 # Pluggable class-based views
@@ -119,7 +122,6 @@ class LoginAPI(MethodView):
             }
             return make_response(jsonify(responseObject)), 500
 
-
 class UserAPI(MethodView):
     """
     User Resource
@@ -168,7 +170,6 @@ class UserAPI(MethodView):
                 'message': 'Provide a valid auth token.'
             }
             return make_response(jsonify(responseObject)), 401
-
 
 class LogoutAPI(MethodView):
     """

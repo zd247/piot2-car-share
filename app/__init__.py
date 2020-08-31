@@ -29,7 +29,7 @@ babel = Babel(app)
 
 
 # register controller blueprints
-from app.controllers.auth import auth_blueprint
-from app.controllers.cars import cars_blueprint
+from app.views.auth_method import auth_blueprint
+from app.views.cars_method import cars_blueprint
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(cars_blueprint)
