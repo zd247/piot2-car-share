@@ -1,17 +1,21 @@
 import numpy as np
+import json
 
 from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
-from app import bcrypt, db
-from app.models.user import User, BlacklistToken
+from app import bcrypt, db, blacklist
+from app.models.user import User
+
+from app.decorator import *
 
 from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
 
 from flask_jwt_extended import (create_access_token, create_refresh_token,
-                                jwt_required, jwt_refresh_token_required, get_jwt_identity)
+                                jwt_required, jwt_refresh_token_required, get_jwt_identity,
+                                get_jwt_claims, get_raw_jwt)
 
-import json
+
 
 
 """ 
@@ -39,24 +43,22 @@ class RegisterAPI(MethodView):
                     email=post_data.get('email'),
                     password=post_data.get('password'),
                     first_name = post_data.get('first_name'),
-                    last_name = post_data.get('last_name')
+                    last_name = post_data.get('last_name'),
+                    role= post_data.get('role')
                 )
                 
-                # if post_data.get('role') is not None:
-                #     user.roles.append(Role(name=post_data.get('role')))
-                # else:
-                #     user.roles.append(Role(name='Customer'))
-                    
+    
                 # insert the user to database
                 db.session.add(user)
                 db.session.commit()
                 
+    
                 # generate the auth token
                 access_token = create_access_token(identity=post_data)
                 refresh_token = create_refresh_token(identity=post_data)
                 
                 
-                # roles = json.dumps(user.roles, cls=AlchemyEncoder)
+                # roles = json.dumps(user.roles, cls=AlchemyEncoder) #TODO: when have more than 5 roles
                 
                 # construct res message
                 responseObject = {
@@ -100,7 +102,8 @@ class LoginAPI(MethodView):
                 # construct indentity data
                 post_data['first_name'] = user.first_name
                 post_data['last_name'] = user.last_name
-                post_data['registered_on'] = user.registered_on            
+                post_data['registered_on'] = user.registered_on
+                post_data['role'] = user.role            
                 
                 access_token = create_access_token(identity=post_data)
                 refresh_token = create_refresh_token(identity=post_data)
@@ -131,14 +134,11 @@ class UserAPI(MethodView):
     """
     User Resource
     """
-    
     @jwt_required
     def get(self):
         # get the auth token
         try:
             current_user = get_jwt_identity()
-            
-            # roles = json.dumps(user.roles, cls=AlchemyEncoder)
             
             responseObject = {
                 'status': 'success',
@@ -146,8 +146,7 @@ class UserAPI(MethodView):
                     'email': current_user['email'],
                     'first_name': current_user['first_name'],
                     'last_name': current_user['last_name'],
-                    # 'roles': roles,
-                    'registered_on': current_user['registered_on']
+                    'role': current_user['role']
                 }
             }
             return make_response(jsonify(responseObject)), 200
@@ -162,53 +161,47 @@ class LogoutAPI(MethodView):
     """
     Logout Resource
     """
-    def post(self):
-        # get auth token
-        auth_header = request.headers.get('Authorization')
-        if auth_header:
-            auth_token = auth_header.split(" ")[1]
-        else:
-            auth_token = ''
-            
-            
-        if auth_token:
-            resp = User.decode_auth_token(auth_token)
-            if not isinstance(resp, str):
-                # mark the token as blacklisted
-                blacklist_token = BlacklistToken(token=auth_token)
-                try:
-                    # insert the token
-                    db.session.add(blacklist_token)
-                    db.session.commit()
-                    responseObject = {
-                        'status': 'success',
-                        'message': 'Successfully logged out.'
-                    }
-                    return make_response(jsonify(responseObject)), 200
-                except Exception as e:
-                    responseObject = {
-                        'status': 'fail',
-                        'message': str(e)
-                    }
-                    return make_response(jsonify(responseObject)), 200
-            else:
-                responseObject = {
-                    'status': 'fail',
-                    'message': resp
-                }
-                return make_response(jsonify(responseObject)), 500
-        else:
+    @jwt_required
+    def delete(self):
+       
+        print (get_raw_jwt()['jti'])
+        
+        try:
+            jti = get_raw_jwt()['jti']
+            blacklist.add(jti)
+            responseObject = {
+                'status': 'success',
+                'message': 'Successfully logged out.'
+            }
+            return make_response(jsonify(responseObject)), 200
+        except Exception as e:
             responseObject = {
                 'status': 'fail',
-                'message': 'Provide a valid auth token.'
+                'message': str(e)
             }
-            return make_response(jsonify(responseObject)), 403
+            return make_response(jsonify(responseObject)), 200
+        
+class RefreshAPI(MethodView):
+    """ 
+        Refresh accessing token resource
+    """
+    
+    @jwt_refresh_token_required
+    def post (self):
+        current_user = get_jwt_identity()
+        ret = {
+            'auth_token': create_access_token(identity=current_user)
+        }
+        return jsonify(ret), 200
+        
+    
 
 # define the API resources
 registration_view = RegisterAPI.as_view('register_api')
 login_view = LoginAPI.as_view('login_api')
 user_view = UserAPI.as_view('user_api')
 logout_view = LogoutAPI.as_view('logout_api')
+refresh_view = RefreshAPI.as_view('refresh_api')
 
 # add Rules for API Endpoints
 auth_blueprint.add_url_rule(
@@ -229,28 +222,33 @@ auth_blueprint.add_url_rule(
 auth_blueprint.add_url_rule(
     '/logout',
     view_func=logout_view,
+    methods=['DELETE']
+)
+auth_blueprint.add_url_rule(
+    '/refresh',
+    view_func=refresh_view,
     methods=['POST']
 )
 
 
 # ========================[External]=======================
 
-from sqlalchemy.ext.declarative import DeclarativeMeta
+# from sqlalchemy.ext.declarative import DeclarativeMeta
 
-class AlchemyEncoder(json.JSONEncoder):
+# class AlchemyEncoder(json.JSONEncoder):
     
-    def default(self, obj):
-        if isinstance(obj.__class__, DeclarativeMeta):
-            # an SQLAlchemy class
-            fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-                data = obj.__getattribute__(field)
-                try:
-                    json.dumps(data) # this will fail on non-encodable values, like other classes
-                    fields[field] = data
-                except TypeError:
-                    fields[field] = None
-            # a json-encodable dict
-            return fields
+#     def default(self, obj):
+#         if isinstance(obj.__class__, DeclarativeMeta):
+#             # an SQLAlchemy class
+#             fields = {}
+#             for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+#                 data = obj.__getattribute__(field)
+#                 try:
+#                     json.dumps(data) # this will fail on non-encodable values, like other classes
+#                     fields[field] = data
+#                 except TypeError:
+#                     fields[field] = None
+#             # a json-encodable dict
+#             return fields
 
-        return json.JSONEncoder.default(self, obj)
+#         return json.JSONEncoder.default(self, obj)

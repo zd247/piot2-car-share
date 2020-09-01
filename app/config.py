@@ -29,6 +29,9 @@ class BaseConfig:
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
     USER_EMAIL_SENDER_EMAIL = "piot2@gmail.com"
     
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1, seconds=1)
 
 

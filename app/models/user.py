@@ -3,9 +3,9 @@ import datetime
 
 from app import app, db, bcrypt
 from flask_user import UserMixin
+from flask_jwt_extended import get_jwt_claims
 
-
-class User(db.Model, UserMixin):
+class User(db.Model):
     """ User Model for storing user related details """
     __tablename__ = "users"
     
@@ -22,53 +22,56 @@ class User(db.Model, UserMixin):
 
     # Define the relationship to Role via UserRoles
     # roles = db.relationship('Role', secondary='user_roles')
+    role  = db.Column(db.String(30), nullable=False, server_default='customer')
 
-    def __init__(self, email, password, first_name, last_name):
+    def __init__(self, email, password, first_name, last_name, role):
         self.email = email
         self.password = bcrypt.generate_password_hash(
             password, app.config.get('BCRYPT_LOG_ROUNDS')
         ).decode()
         self.first_name = first_name
         self.last_name = last_name
+        self.role = role
         self.registered_on = datetime.datetime.now()
     
 
-# ============[Define the Role data-model]===============
-# class Role(db.Model):
-#     __tablename__ = 'roles'
-#     id = db.Column(db.Integer(), primary_key=True)
-#     name = db.Column(db.String(50), unique=True)
+# #TODO: DO this when working with more than 5 roles (store them as table and cross reference them)
+# # ============[Define the Role data-model]===============
+# # class Role(db.Model):
+# #     __tablename__ = 'roles'
+# #     id = db.Column(db.Integer(), primary_key=True)
+# #     name = db.Column(db.String(50), unique=True)
 
-# # ===============[Define the UserRoles association table]==============
-# class UserRoles(db.Model):
-#     __tablename__ = 'user_roles'
-#     id = db.Column(db.Integer(), primary_key=True)
-#     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
-#     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+# # # ===============[Define the UserRoles association table]==============
+# # class UserRoles(db.Model):
+# #     __tablename__ = 'user_roles'
+# #     id = db.Column(db.Integer(), primary_key=True)
+# #     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+# #     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
 
-# ============[Define black list token for logging out]===============
-class BlacklistToken(db.Model):
-    """
-    Token Model for storing JWT tokens
-    """
-    __tablename__ = 'blacklist_tokens'
+# # ============[Define black list token for logging out]===============
+# class BlacklistToken(db.Model):
+#     """
+#     Token Model for storing JWT tokens
+#     """
+#     __tablename__ = 'blacklist_tokens'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    token = db.Column(db.String(500), unique=True, nullable=False)
-    blacklisted_on = db.Column(db.DateTime, nullable=False)
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     token = db.Column(db.String(500), unique=True, nullable=False)
+#     blacklisted_on = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, token):
-        self.token = token
-        self.blacklisted_on = datetime.datetime.now()
+#     def __init__(self, token):
+#         self.token = token
+#         self.blacklisted_on = datetime.datetime.now()
 
-    def __repr__(self):
-        return '<id: token: {}'.format(self.token)
+#     def __repr__(self):
+#         return '<id: token: {}'.format(self.token)
 
-    @staticmethod
-    def check_blacklist(auth_token):
-        # check whether auth token has been blacklisted
-        res = BlacklistToken.query.filter_by(token=str(auth_token)).first()
-        if res:
-            return True
-        else:
-            return False
+#     @staticmethod
+#     def check_blacklist(auth_token):
+#         # check whether auth token has been blacklisted
+#         res = BlacklistToken.query.filter_by(token=str(auth_token)).first()
+#         if res:
+#             return True
+#         else:
+#             return False

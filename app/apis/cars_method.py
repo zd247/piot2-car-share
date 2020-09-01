@@ -4,7 +4,7 @@ from app.models.car import Car
 
 from app import db
 
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_claims
 
 cars_blueprint = Blueprint('cars', __name__, url_prefix="/cars")
 
@@ -26,35 +26,44 @@ class RestfulAPI (MethodView):
     """
     Cars CRUD APIs
     """
+    @jwt_required
     def get(self, car_name = None):
         """ Responds to GET requests """
-        # expose the list of cars
-        if (car_name is None):
-            cars = Car.query.all()
-            cars_dict = {}
+        try: 
+            # expose the list of cars
+            if (car_name is None):
+                cars = Car.query.all()
+                cars_dict = {}
 
-            for car in cars:
-                new_car = new_car_dict(self, car)
-                cars_dict[new_car['name']] = new_car
+                for car in cars:
+                    new_car = new_car_dict(self, car)
+                    cars_dict[new_car['name']] = new_car
+                    
+                responseObject = {
+                            'status': 'success',
+                            'message': 'Response to get all cars',
+                            'data': cars_dict
+                        }
                 
+                return make_response(jsonify(responseObject)), 200
+            else:
+                # expose the single car
+                car = Car.query.filter_by(name=car_name).first()
+                
+                new_car = new_car_dict (self, car)
+                
+                responseObject = {
+                            'status': 'success',
+                            'message': 'Response to get single car',
+                            'data': new_car
+                        }
+                return make_response(jsonify(responseObject)), 200
+        except Exception as e:
             responseObject = {
-                        'status': 'success',
-                        'message': 'Response to get all cars',
-                        'data': cars_dict
-                    }
-            
-            return make_response(jsonify(responseObject)), 200
-        else:
-            # expose the single car
-            car = Car.query.filter_by(name=car_name).first()
-            
-            new_car = new_car_dict (self, car)
-            
-            responseObject = {
-                        'status': 'success',
-                        'message': 'Response to get single car',
-                        'data': new_car
-                    }
+                            'status': 'success',
+                            'message': 'Response to get single car',
+                            'data': new_car
+                        }
             return make_response(jsonify(responseObject)), 200
         
 
