@@ -4,6 +4,8 @@ from app.models.car import Car
 
 from app import db
 
+from flask_jwt_extended import jwt_required
+
 cars_blueprint = Blueprint('cars', __name__, url_prefix="/cars")
 
 def new_car_dict(self, car):

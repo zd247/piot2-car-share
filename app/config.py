@@ -1,4 +1,5 @@
 import os
+import datetime
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 postgres_local_base = 'postgresql://postgres:@localhost/'
@@ -27,6 +28,8 @@ class BaseConfig:
     USER_ENABLE_USERNAME = False    # Disable username authentication
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
     USER_EMAIL_SENDER_EMAIL = "piot2@gmail.com"
+    
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1, seconds=1)
 
 
 class DevelopmentConfig(BaseConfig):

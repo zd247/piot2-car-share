@@ -4,14 +4,19 @@ from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
 from app import bcrypt, db
-from app.models.user import User, BlacklistToken, Role
+from app.models.user import User, BlacklistToken
 
 from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
 
+from flask_jwt_extended import (create_access_token, create_refresh_token,
+                                jwt_required, jwt_refresh_token_required, get_jwt_identity)
 
 import json
 
-# Pluggable class-based views
+
+""" 
+    Pluggable class-based views
+"""
 
 auth_blueprint = Blueprint('auth', __name__, url_prefix="/auth")
 
@@ -37,40 +42,34 @@ class RegisterAPI(MethodView):
                     last_name = post_data.get('last_name')
                 )
                 
-                if post_data.get('role') is not None:
-                    user.roles.append(Role(name=post_data.get('role')))
-                else:
-                    user.roles.append(Role(name='Customer'))
+                # if post_data.get('role') is not None:
+                #     user.roles.append(Role(name=post_data.get('role')))
+                # else:
+                #     user.roles.append(Role(name='Customer'))
                     
                 # insert the user to database
                 db.session.add(user)
                 db.session.commit()
                 
                 # generate the auth token
-                auth_token = user.encode_auth_token(user.id)
+                access_token = create_access_token(identity=post_data)
+                refresh_token = create_refresh_token(identity=post_data)
                 
-                roles = json.dumps(user.roles, cls=AlchemyEncoder)
+                
+                # roles = json.dumps(user.roles, cls=AlchemyEncoder)
                 
                 # construct res message
                 responseObject = {
                     'status': 'success',
                     'message': 'Successfully registered.',
-                    'auth_token': auth_token.decode(),
-                    'data': {
-                        'user_id': user.id,
-                        'email': user.email,
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'roles' : roles,
-                        'registered_on': user.registered_on
-                    }
+                    'auth_token': access_token
                 }
                 
                 return make_response(jsonify(responseObject)), 201
             except Exception as e:
                 responseObject = {
                     'status': 'fail',
-                    'message': 'Some error occurred. Please try again.'
+                    'message': str(e)
                 }
                 return make_response(jsonify(responseObject)), 401
         else:
@@ -97,17 +96,23 @@ class LoginAPI(MethodView):
                 email=post_data.get('email')
             ).first()
             
-            if user and bcrypt.check_password_hash(
-                user.password, post_data.get('password')
-            ):
-                auth_token = user.encode_auth_token(user.id)
-                if auth_token:
-                    responseObject = {
-                        'status': 'success',
-                        'message': 'Successfully logged in.',
-                        'auth_token': auth_token.decode()
-                    }
-                    return make_response(jsonify(responseObject)), 200
+            if user and bcrypt.check_password_hash(user.password, post_data.get('password')):
+                # construct indentity data
+                post_data['first_name'] = user.first_name
+                post_data['last_name'] = user.last_name
+                post_data['registered_on'] = user.registered_on            
+                
+                access_token = create_access_token(identity=post_data)
+                refresh_token = create_refresh_token(identity=post_data)
+                
+                
+                responseObject = {
+                    'status': 'success',
+                    'message': 'Successfully logged in.',
+                    'auth_token': access_token
+                }
+                
+                return make_response(jsonify(responseObject)), 200
             else:
                 responseObject = {
                     'status': 'fail',
@@ -115,62 +120,44 @@ class LoginAPI(MethodView):
                 }
                 return make_response(jsonify(responseObject)), 404
         except Exception as e:
-            print(e)
             responseObject = {
                 'status': 'fail',
-                'message': 'Try again'
+                'message': str(e)
             }
             return make_response(jsonify(responseObject)), 500
+
 
 class UserAPI(MethodView):
     """
     User Resource
     """
+    
+    @jwt_required
     def get(self):
         # get the auth token
-        auth_header = request.headers.get('Authorization')
-        if auth_header:
-            try:
-                auth_token = auth_header.split(" ")[1]
-            except IndexError:
-                responseObject = {
-                    'status': 'fail',
-                    'message': 'Bearer token malformed.'
+        try:
+            current_user = get_jwt_identity()
+            
+            # roles = json.dumps(user.roles, cls=AlchemyEncoder)
+            
+            responseObject = {
+                'status': 'success',
+                'data': {
+                    'email': current_user['email'],
+                    'first_name': current_user['first_name'],
+                    'last_name': current_user['last_name'],
+                    # 'roles': roles,
+                    'registered_on': current_user['registered_on']
                 }
-                return make_response(jsonify(responseObject)), 401
-        else:
-            auth_token = ''
-        if auth_token:
-            resp = User.decode_auth_token(auth_token)
-            if not isinstance(resp, str):
-                user = User.query.filter_by(id=resp).first()
-                
-                roles = json.dumps(user.roles, cls=AlchemyEncoder)
-                
-                responseObject = {
-                    'status': 'success',
-                    'data': {
-                        'user_id': user.id,
-                        'email': user.email,
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'roles': roles,
-                        'registered_on': user.registered_on
-                    }
-                }
-                return make_response(jsonify(responseObject)), 200
+            }
+            return make_response(jsonify(responseObject)), 200
+        except Exception as e:
             responseObject = {
                 'status': 'fail',
-                'message': resp
+                'message': str(e)
             }
-            return make_response(jsonify(responseObject)), 401
-        else:
-            responseObject = {
-                'status': 'fail',
-                'message': 'Provide a valid auth token.'
-            }
-            return make_response(jsonify(responseObject)), 401
-
+            return make_response(jsonify(responseObject)), 500
+       
 class LogoutAPI(MethodView):
     """
     Logout Resource
@@ -201,7 +188,7 @@ class LogoutAPI(MethodView):
                 except Exception as e:
                     responseObject = {
                         'status': 'fail',
-                        'message': e
+                        'message': str(e)
                     }
                     return make_response(jsonify(responseObject)), 200
             else:
@@ -209,7 +196,7 @@ class LogoutAPI(MethodView):
                     'status': 'fail',
                     'message': resp
                 }
-                return make_response(jsonify(responseObject)), 401
+                return make_response(jsonify(responseObject)), 500
         else:
             responseObject = {
                 'status': 'fail',
