@@ -16,12 +16,6 @@ from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 get_jwt_claims, get_raw_jwt)
 
 
-
-
-""" 
-    Pluggable class-based views
-"""
-
 auth_blueprint = Blueprint('auth', __name__, url_prefix="/auth")
 
 class RegisterAPI(MethodView):
@@ -47,7 +41,7 @@ class RegisterAPI(MethodView):
                     role= post_data.get('role')
                 )
                 
-    
+                    
                 # insert the user to database
                 db.session.add(user)
                 db.session.commit()

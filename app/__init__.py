@@ -52,6 +52,11 @@ db = SQLAlchemy(app)
 # register controller blueprints
 from app.apis.auth_method import auth_blueprint
 from app.apis.cars_method import cars_blueprint
+from app.apis.users_method import users_blueprint
+from app.apis.bookings_method import bookings_blueprint
+
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(cars_blueprint)
+app.register_blueprint(users_blueprint)
+app.register_blueprint(bookings_blueprint)
 

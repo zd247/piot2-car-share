@@ -20,7 +20,6 @@ class User(db.Model):
     
     active = db.Column('is_active', db.Boolean(), nullable=False, server_default='1')
 
-    # Define the relationship to Role via UserRoles
     # roles = db.relationship('Role', secondary='user_roles')
     role  = db.Column(db.String(30), nullable=False, server_default='customer')
 
@@ -33,7 +32,8 @@ class User(db.Model):
         self.last_name = last_name
         self.role = role
         self.registered_on = datetime.datetime.now()
-    
+
+
 
 # #TODO: DO this when working with more than 5 roles (store them as table and cross reference them)
 # # ============[Define the Role data-model]===============
@@ -48,30 +48,3 @@ class User(db.Model):
 # #     id = db.Column(db.Integer(), primary_key=True)
 # #     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
 # #     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
-
-# # ============[Define black list token for logging out]===============
-# class BlacklistToken(db.Model):
-#     """
-#     Token Model for storing JWT tokens
-#     """
-#     __tablename__ = 'blacklist_tokens'
-
-#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#     token = db.Column(db.String(500), unique=True, nullable=False)
-#     blacklisted_on = db.Column(db.DateTime, nullable=False)
-
-#     def __init__(self, token):
-#         self.token = token
-#         self.blacklisted_on = datetime.datetime.now()
-
-#     def __repr__(self):
-#         return '<id: token: {}'.format(self.token)
-
-#     @staticmethod
-#     def check_blacklist(auth_token):
-#         # check whether auth token has been blacklisted
-#         res = BlacklistToken.query.filter_by(token=str(auth_token)).first()
-#         if res:
-#             return True
-#         else:
-#             return False

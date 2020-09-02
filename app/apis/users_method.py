@@ -1,62 +1,59 @@
 from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
-from app.models.car import Car
+from app.models.user import User
 
 from app import db
-
-from flask_jwt_extended import jwt_required, get_jwt_claims
 from app.decorator import *
+from flask_jwt_extended import jwt_required, get_jwt_claims
 
-cars_blueprint = Blueprint('cars', __name__, url_prefix="/cars")
+users_blueprint = Blueprint('users', __name__, url_prefix="/users")
 
-def new_car_dict(self, car):
+def new_user_dict(self, user):
     return {
-        'name': car.name,
-        'make': car.make,
-        'body': car.body,
-        'colour': car.colour,
-        'seats': car.seats,
-        'location': car.location,
-        'cost_per_hour': car.cost_per_hour,
-        'manu_date': car.manu_date
+        'email': user.email,
+        'password': user.password,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'role': user.role
     }
-    
     
 
 class RestfulAPI (MethodView):
     """
-    Cars CRUD APIs
+    Users CRUD APIs
     """
+    
     @jwt_required
-    def get(self, car_name = None):
+    @has_roles(['admin'])
+    def get(self, email = None):
         """ Responds to GET requests """
         try: 
             # expose the list of cars
-            if (car_name is None):
-                cars = Car.query.all()
-                cars_dict = {}
+            if email is None:
+                users = User.query.all()
+                user_dict = {}
 
-                for car in cars:
-                    new_car = new_car_dict(self, car)
-                    cars_dict[new_car['name']] = new_car
+                for user in users:
+                    new_user = new_user_dict(self, user)
+                    user_dict[new_user['email']] = new_user
                     
                 responseObject = {
                             'status': 'success',
-                            'message': 'Response to get all cars',
-                            'data': cars_dict
+                            'message': 'Response to get all users',
+                            'data': user_dict
                         }
                 
                 return make_response(jsonify(responseObject)), 200
             else:
                 # expose the single car
-                car = Car.query.filter_by(name=car_name).first()
+                user = User.query.filter_by(email=email).first()
                 
-                new_car = new_car_dict (self, car)
+                new_user = new_user_dict (self, user)
                 
                 responseObject = {
                             'status': 'success',
-                            'message': 'Response to get single car',
-                            'data': new_car
+                            'message': 'Response to get single user',
+                            'data': new_user
                         }
                 return make_response(jsonify(responseObject)), 200
         except Exception as e:
@@ -75,30 +72,27 @@ class RestfulAPI (MethodView):
         try: 
             post_data = request.get_json()
             
-            query_car = Car.query.filter_by(
-                name = post_data.get('name')   
+            query_user = User.query.filter_by(
+                email = post_data.get('email')   
             ).first()
             
-            if not query_car:
-                car = Car (post_data.get('name'),
-                           post_data.get('make'),
-                           post_data.get('body'),
-                           post_data.get('colour'),
-                           post_data.get('seats'),
-                           post_data.get('location'),
-                           post_data.get('cost_per_hour'),
-                           post_data.get('manu_date')
+            if not query_user:
+                user = User (post_data.get('email'),
+                           post_data.get('password'),
+                           post_data.get('first_name'),
+                           post_data.get('last_name'),
+                           post_data.get('role')
                         )
-                db.session.add(car)
+                db.session.add(user)
                 db.session.commit()
                 
                 # parse into dictionary type
-                new_car = new_car_dict(self, car)
+                new_user = new_user_dict(self, user)
                                
                 responseObject = {
                     'status': 'success',
-                    'message': 'New car created',
-                    'data': new_car
+                    'message': 'New user created',
+                    'data': new_user
                 }
                 
                 return make_response(jsonify(responseObject), 201)
@@ -106,9 +100,10 @@ class RestfulAPI (MethodView):
             else:
                 responseObject = {
                     'status': 'Not allowed',
-                    'message': 'Car name has already existed'
+                    'message': 'User email has already existed'
                 }
                 return make_response(jsonify(responseObject), 401)
+            
         except Exception as e:
             responseObject = {
                 'status': 'fail',
@@ -119,7 +114,7 @@ class RestfulAPI (MethodView):
     
     @jwt_required
     @has_roles(['admin'])        
-    def put(self, car_name):
+    def put(self, email):
         """ Responds to PUT requests
             Request body must contain all fields    
         """    
@@ -128,29 +123,24 @@ class RestfulAPI (MethodView):
             
             
             # query the car from the params
-            query_car = Car.query.filter_by(name = car_name).first()
+            query_user = User.query.filter_by(email = email).first()
             
 
             # modify the queried car with the request body
-            if query_car is not None:
-                print (query_car)
-                query_car.name = put_data.get('name')
-                query_car.body = put_data.get('body')
-                query_car.make = put_data.get('make')
-                query_car.colour = put_data.get('colour')
-                query_car.seats = put_data.get('seats')
-                query_car.location = put_data.get('location')
-                query_car.cost_per_hour = put_data.get('cost_per_hour')
-                query_car.manu_date = put_data.get('manu_date')
+            if query_user is not None:
+                query_user.first_name = put_data.get('first_name')
+                query_user.last_name = put_data.get('last_name')
+                query_user.role = put_data.get('role')
+                
                 
                 db.session.commit()
                 
-                updated_car = new_car_dict(self,query_car)
+                updated_user = new_user_dict(self,query_user)
                 
                 responseObject = {
                     "status": 'success',
                     'message': 'Updated a car successfully',
-                    'data': updated_car
+                    'data': updated_user
                 }
                 
                 return make_response(jsonify(responseObject),200)
@@ -158,34 +148,33 @@ class RestfulAPI (MethodView):
             else:
                 responseObject = {
                     'status': 'fail',
-                    'message': 'Cannot find the car name in query'
+                    'message': 'Cannot find the user email in query'
                 }
                 
                 return make_response(jsonify(responseObject)), 500
                 
             # Car.objects.get(name=car_name).update(**put_data)
         except Exception as e:
-            print ("EXCEPTION ERROR DEBUG")
-            print(e)
+            
             responseObject = {
                 'status': 'fail',
-                'message': 'Try again'
+                'message': str(e)
             }
             return make_response(jsonify(responseObject), 500) 
             
     @jwt_required
     @has_roles(['admin'])  
-    def delete(self, car_name):
+    def delete(self, email):
         """ Responds to DELETE requests """    
-        if car_name:
+        if email:
             try:
                 # query the car from the params
-                query_car = Car.query.filter_by(name = car_name).first()
+                query_user = User.query.filter_by(email = email).first()
                 
 
                 # modify the queried car with the request body
-                if query_car is not None:
-                    db.session.delete(query_car)
+                if query_user is not None:
+                    db.session.delete(query_user)
                     db.session.commit()
                     
                     responseObject = {
@@ -198,7 +187,7 @@ class RestfulAPI (MethodView):
                 else:
                     responseObject = {
                         'status': 'fail',
-                        'message': 'Cannot find the car name in query'
+                        'message': 'Cannot find the user email in query'
                     }
                     
                     return make_response(jsonify(responseObject)), 500
@@ -208,36 +197,23 @@ class RestfulAPI (MethodView):
                 print(e)
                 responseObject = {
                     'status': 'fail',
-                    'message': 'Try again'
+                    'message': str(e)
                 }
-                return make_response(jsonify(responseObject), 500)  
-            
-class IssueAPI (MethodView):
-    
-    @jwt_required
-    @has_roles(['admin'])  
-    def post(self):
-        """ report an issue with a car as admin or ..."""  
+                return make_response(jsonify(responseObject), 500) 
+
 
 restful_view = RestfulAPI.as_view('restful_api')
-issue_view = IssueAPI.as_view('issue_api')
 
 
 # add Rules for API Endpoints
-cars_blueprint.add_url_rule(
+users_blueprint.add_url_rule(
     '',
     view_func=restful_view,
     methods=['POST', 'GET']
 )
 
-cars_blueprint.add_url_rule(
-    '/<string:car_name>',
+users_blueprint.add_url_rule(
+    '/<string:email>',
     view_func=restful_view,
     methods=['GET', 'PUT', 'DELETE']
-)
-
-cars_blueprint.add_url_rule(
-    '/issues',
-    view_func=issue_view,
-    methods = ['POST', 'GET']
 )
