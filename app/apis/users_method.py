@@ -128,6 +128,7 @@ class RestfulAPI (MethodView):
 
             # modify the queried car with the request body
             if query_user is not None:
+    
                 query_user.first_name = put_data.get('first_name')
                 query_user.last_name = put_data.get('last_name')
                 query_user.role = put_data.get('role')

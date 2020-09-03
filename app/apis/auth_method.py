@@ -58,7 +58,8 @@ class RegisterAPI(MethodView):
                 responseObject = {
                     'status': 'success',
                     'message': 'Successfully registered.',
-                    'auth_token': access_token
+                    'auth_token': access_token,
+                    'role': user.role
                 }
                 
                 return make_response(jsonify(responseObject)), 201
@@ -106,7 +107,8 @@ class LoginAPI(MethodView):
                 responseObject = {
                     'status': 'success',
                     'message': 'Successfully logged in.',
-                    'auth_token': access_token
+                    'auth_token': access_token,
+                    'role': user.role
                 }
                 
                 return make_response(jsonify(responseObject)), 200
@@ -156,10 +158,7 @@ class LogoutAPI(MethodView):
     Logout Resource
     """
     @jwt_required
-    def delete(self):
-       
-        print (get_raw_jwt()['jti'])
-        
+    def delete(self):    
         try:
             jti = get_raw_jwt()['jti']
             blacklist.add(jti)

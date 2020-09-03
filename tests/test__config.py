@@ -29,7 +29,7 @@ class TestTestingConfig(TestCase):
         self.assertTrue(app.config['SECRET_KEY'] == 'my_precious')
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://postgres:@localhost/piot2-test'
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://postgres:@localhost/piot2_test'
         )
 
 

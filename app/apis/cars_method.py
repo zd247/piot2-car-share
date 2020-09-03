@@ -1,4 +1,4 @@
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request, make_response, jsonify, render_template
 from flask.views import MethodView
 from app.models.car import Car
 
@@ -133,7 +133,6 @@ class RestfulAPI (MethodView):
 
             # modify the queried car with the request body
             if query_car is not None:
-                print (query_car)
                 query_car.name = put_data.get('name')
                 query_car.body = put_data.get('body')
                 query_car.make = put_data.get('make')
@@ -194,6 +193,8 @@ class RestfulAPI (MethodView):
                     }
                     
                     return make_response(jsonify(responseObject)), 200
+                
+                
                     
                 else:
                     responseObject = {

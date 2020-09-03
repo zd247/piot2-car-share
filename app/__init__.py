@@ -11,6 +11,8 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 
 
+
+
 # init app and cors
 app = Flask(__name__, instance_relative_config=True)
 
@@ -59,4 +61,3 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(cars_blueprint)
 app.register_blueprint(users_blueprint)
 app.register_blueprint(bookings_blueprint)
-

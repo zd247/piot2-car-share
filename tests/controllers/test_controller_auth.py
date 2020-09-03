@@ -3,7 +3,7 @@ import json
 import unittest
 
 from app import db
-from app.models.user import User, BlacklistToken
+from app.models.user import User
 from tests.base import BaseTestCase
 
 
@@ -30,13 +30,13 @@ def login_user(self, email, password):
         content_type='application/json',
     )
 
-def logout_user(self, data):
+def logout_user(self, auth_token):
     return self.client.post(
-                '/auth/logout',
-                headers=dict(
-                    Authorization='Bearer ' + json.loads(data)['auth_token']
-                )
-            )
+        '/auth/logout',
+        headers=dict(
+            Authorization='Bearer ' + auth_token
+        )
+    )
     
 
 class TestAuthBlueprint(BaseTestCase):
@@ -49,8 +49,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['message'] == 'Successfully registered.')
             
-            role_data = json.loads(data['data']['roles'])
-            self.assertTrue(role_data[0]['name'] == 'Customer')
+            self.assertTrue(data['role'] == 'customer')
             
             self.assertTrue(data['auth_token'])
             self.assertTrue(response.content_type == 'application/json')
@@ -59,14 +58,13 @@ class TestAuthBlueprint(BaseTestCase):
     def test_registration_with_roles(self):
         """ Test for user registration with roles"""
         with self.client:
-            response = register_user(self, 'joe@gmail.com', '123456', "John", "Doe", role='Manager')
+            response = register_user(self, 'joe@gmail.com', '123456', "John", "Doe", role='manager')
             data = json.loads(response.data.decode())
             
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['message'] == 'Successfully registered.')
             
-            role_data = json.loads(data['data']['roles'])
-            self.assertTrue(role_data[0]['name'] == 'Manager')
+            self.assertTrue(data['role'] == 'manager')
             
             self.assertTrue(data['auth_token'])
             self.assertTrue(response.content_type == 'application/json')
@@ -79,7 +77,8 @@ class TestAuthBlueprint(BaseTestCase):
             email='joe@gmail.com',
             password='test',
             first_name = 'Doe',
-            last_name='John'
+            last_name='John',
+            role="customer"
         )
         db.session.add(user)
         db.session.commit()
@@ -124,161 +123,41 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 404)
 
-    # def test_user_status(self):
-    #     """ Test for user status """
-    #     with self.client:
-    #         resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe", role='Engineer')
-    #         response = self.client.get(
-    #             '/auth/status',
-    #             headers=dict(
-    #                 Authorization='Bearer ' + json.loads(
-    #                     resp_register.data.decode()
-    #                 )['auth_token']
-    #             )
-    #         )
-    #         data = json.loads(response.data.decode())
-    #         self.assertTrue(data['status'] == 'success')
-    #         self.assertTrue(data['data'] is not None)
+    def test_user_status(self):
+        """ Test for user status """
+        with self.client:
+            resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe", role='engineer')
+            response = self.client.get(
+                '/auth/status',
+                headers=dict(
+                    Authorization='Bearer ' + json.loads(
+                        resp_register.data.decode()
+                    )['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'success')
+            self.assertTrue(data['data'] is not None)
             
-    #         role_data = json.loads(data['data']['roles'])
-    #         self.assertTrue(role_data[0]['name'] == 'Engineer')
+            self.assertTrue(data['data']['role'] == 'engineer')
             
-    #         self.assertTrue(data['data']['email'] == 'joe@gmail.com')
-    #         self.assertEqual(response.status_code, 200)
+            self.assertTrue(data['data']['email'] == 'joe@gmail.com')
+            self.assertEqual(response.status_code, 200)
 
-    # def test_user_status_malformed_bearer_token(self):
-    #     """ Test for user status with malformed bearer token"""
-    #     with self.client:
-    #         resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
-    #         response = self.client.get(
-    #             '/auth/status',
-    #             headers=dict(
-    #                 Authorization='Bearer' + json.loads(
-    #                     resp_register.data.decode()
-    #                 )['auth_token']
-    #             )
-    #         )
-    #         data = json.loads(response.data.decode())
-    #         self.assertTrue(data['status'] == 'fail')
-    #         self.assertTrue(data['message'] == 'Bearer token malformed.')
-    #         self.assertEqual(response.status_code, 401)
-
-    # def test_valid_logout(self):
-    #     """ Test for logout before token expires """
-    #     with self.client:
-    #         # user registration
-    #         resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
-    #         data_register = json.loads(resp_register.data.decode())
-    #         self.assertTrue(data_register['status'] == 'success')
-    #         self.assertTrue(
-    #             data_register['message'] == 'Successfully registered.')
-    #         self.assertTrue(data_register['auth_token'])
-    #         self.assertTrue(resp_register.content_type == 'application/json')
-    #         self.assertEqual(resp_register.status_code, 201)
-    #         # user login
-    #         resp_login = login_user(self, 'joe@gmail.com', '123456')
-    #         data_login = json.loads(resp_login.data.decode())
-    #         self.assertTrue(data_login['status'] == 'success')
-    #         self.assertTrue(data_login['message'] == 'Successfully logged in.')
-    #         self.assertTrue(data_login['auth_token'])
-    #         self.assertTrue(resp_login.content_type == 'application/json')
-    #         self.assertEqual(resp_login.status_code, 200)
-    #         # valid token logout
-    #         response = logout_user(self, resp_login.data.decode())
-    #         data = json.loads(response.data.decode())
-    #         self.assertTrue(data['status'] == 'success')
-    #         self.assertTrue(data['message'] == 'Successfully logged out.')
-    #         self.assertEqual(response.status_code, 200)
-
-    # def test_invalid_logout(self):
-    #     """ Testing logout after the token expires """
-    #     with self.client:
-    #         # user registration
-    #         resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
-    #         data_register = json.loads(resp_register.data.decode())
-    #         self.assertTrue(data_register['status'] == 'success')
-    #         self.assertTrue(
-    #             data_register['message'] == 'Successfully registered.')
-    #         self.assertTrue(data_register['auth_token'])
-    #         self.assertTrue(resp_register.content_type == 'application/json')
-    #         self.assertEqual(resp_register.status_code, 201)
-    #         # user login
-    #         resp_login = login_user(self, 'joe@gmail.com', '123456')
-    #         data_login = json.loads(resp_login.data.decode())
-    #         self.assertTrue(data_login['status'] == 'success')
-    #         self.assertTrue(data_login['message'] == 'Successfully logged in.')
-    #         self.assertTrue(data_login['auth_token'])
-    #         self.assertTrue(resp_login.content_type == 'application/json')
-    #         self.assertEqual(resp_login.status_code, 200)
-    #         # invalid token logout
-    #         time.sleep(2)
-    #         response = logout_user(self, resp_login.data.decode())
-    #         data = json.loads(response.data.decode())
-    #         self.assertTrue(data['status'] == 'fail')
-    #         self.assertTrue(
-    #             data['message'] == 'Signature expired. Please log in again.')
-    #         self.assertEqual(response.status_code, 401)
-
-    # def test_valid_blacklisted_token_logout(self):
-    #     """ Test for logout after a valid token gets blacklisted """
-    #     with self.client:
-    #         # user registration
-    #         resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
-    #         data_register = json.loads(resp_register.data.decode())
-    #         self.assertTrue(data_register['status'] == 'success')
-    #         self.assertTrue(
-    #             data_register['message'] == 'Successfully registered.')
-    #         self.assertTrue(data_register['auth_token'])
-    #         self.assertTrue(resp_register.content_type == 'application/json')
-    #         self.assertEqual(resp_register.status_code, 201)
-    #         # user login
-    #         resp_login = login_user(self, 'joe@gmail.com', '123456')
-    #         data_login = json.loads(resp_login.data.decode())
-    #         self.assertTrue(data_login['status'] == 'success')
-    #         self.assertTrue(data_login['message'] == 'Successfully logged in.')
-    #         self.assertTrue(data_login['auth_token'])
-    #         self.assertTrue(resp_login.content_type == 'application/json')
-    #         self.assertEqual(resp_login.status_code, 200)
-    #         # blacklist a valid token
-    #         blacklist_token = BlacklistToken(
-    #             token=json.loads(resp_login.data.decode())['auth_token'])
-    #         db.session.add(blacklist_token)
-    #         db.session.commit()
-    #         # blacklisted valid token logout
-    #         response = self.client.post(
-    #             '/auth/logout',
-    #             headers=dict(
-    #                 Authorization='Bearer ' + json.loads(
-    #                     resp_login.data.decode()
-    #                 )['auth_token']
-    #             )
-    #         )
-    #         data = json.loads(response.data.decode())
-    #         self.assertTrue(data['status'] == 'fail')
-    #         self.assertTrue(data['message'] == 'Token blacklisted. Please log in again.')
-    #         self.assertEqual(response.status_code, 401)
-
-    # def test_valid_blacklisted_token_user(self):
-    #     """ Test for user status with a blacklisted valid token """
-    #     with self.client:
-    #         resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
-    #         # blacklist a valid token
-    #         blacklist_token = BlacklistToken(
-    #             token=json.loads(resp_register.data.decode())['auth_token'])
-    #         db.session.add(blacklist_token)
-    #         db.session.commit()
-    #         response = self.client.get(
-    #             '/auth/status',
-    #             headers=dict(
-    #                 Authorization='Bearer ' + json.loads(
-    #                     resp_register.data.decode()
-    #                 )['auth_token']
-    #             )
-    #         )
-    #         data = json.loads(response.data.decode())
-    #         self.assertTrue(data['status'] == 'fail')
-    #         self.assertTrue(data['message'] == 'Token blacklisted. Please log in again.')
-    #         self.assertEqual(response.status_code, 401)
+    def test_user_status_malformed_bearer_token(self):
+        """ Test for user status with malformed bearer token"""
+        with self.client:
+            resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
+            response = self.client.get(
+                '/auth/status',
+                headers=dict(
+                    Authorization='Bearer' + json.loads(
+                        resp_register.data.decode()
+                    )['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 422)
 
 
 if __name__ == '__main__':
