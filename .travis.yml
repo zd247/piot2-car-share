@@ -1,9 +1,7 @@
 language: python
 os: osx
-dist:
-  - trusty
-  - precise
-  
+dist: trusty
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
