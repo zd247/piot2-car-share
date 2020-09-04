@@ -8,8 +8,7 @@ from flask_cors import CORS
 
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
-
-
+from flask_restplus import Api
 
 
 # init app and cors
@@ -20,6 +19,9 @@ CORS(app)
 
 bcrypt = Bcrypt(app) 
 jwt = JWTManager(app)
+
+api = Api()
+jwt._set_error_handler_callbacks(api)
 
 blacklist = set()
 
