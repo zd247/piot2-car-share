@@ -23,20 +23,10 @@ try:
 while True:
 	data = conn.recv(1024)
 	decoded = jwt.decode(data, key, algorithms='HS256')
-	print 'I sent a message back in response to: ' + decoded
-	reply = ''
-
-	# process your message
-	if 'Auth' in decoded:
-		reply = 'Authenticating ...!'
-		#check if authentication is correct and reply
-
-	#and so on and on until...
-	elif decoded == 'quit':
-		conn.send('Terminating')
-		break
+	if decoded == '': #TODO: enter pin or get mac address from database
+		reply = 'Authenticated'
 	else:
-		reply = 'Unknown command'
+		reply = 'Access denied'
 
 	# Sending reply
 	reply = jwt.encode(reply, key, algorithm='HS256')
