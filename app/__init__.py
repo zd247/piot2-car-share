@@ -5,7 +5,6 @@ from flask import Flask, request, render_template_string
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_babelex import Babel
 
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
@@ -18,7 +17,6 @@ app = Flask(__name__, instance_relative_config=True)
 
 # security
 CORS(app)
-babel = Babel(app)
 
 bcrypt = Bcrypt(app) 
 jwt = JWTManager(app)
