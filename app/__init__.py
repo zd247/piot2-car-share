@@ -9,6 +9,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_restplus import Api
+from app.cloud import * 
 
 
 # init app and cors
@@ -49,7 +50,8 @@ app_settings = os.getenv(
 app.config.from_object(app_settings)
 
 # declare SQLAlchemy 
-db = SQLAlchemy(app) 
+# db = init_connection_engine()
+db = SQLAlchemy(app)
 
 # register controller blueprints
 from app.apis.auth_method import auth_blueprint
