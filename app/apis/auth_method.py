@@ -74,7 +74,7 @@ class RegisterAPI(MethodView):
                 'status': 'fail',
                 'message': 'User already exists. Please Log in.',
             }
-            return make_response(jsonify(responseObject)), 202
+            return make_response(jsonify(responseObject)), 500
 
     def get(self):
         return "ok"
@@ -98,7 +98,8 @@ class LoginAPI(MethodView):
                 post_data['first_name'] = user.first_name
                 post_data['last_name'] = user.last_name
                 post_data['registered_on'] = user.registered_on
-                post_data['role'] = user.role            
+                post_data['role'] = user.role
+
                 
                 access_token = create_access_token(identity=post_data)
                 refresh_token = create_refresh_token(identity=post_data)

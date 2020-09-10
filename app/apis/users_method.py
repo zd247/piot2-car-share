@@ -177,7 +177,7 @@ class RestfulAPI (MethodView):
                 if query_user is not None:
                     db.session.delete(query_user)
                     db.session.commit()
-                    
+                        
                     responseObject = {
                         'status': 'deleted',
                         'message': 'Successfully deleted a car Record'

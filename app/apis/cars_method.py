@@ -18,7 +18,8 @@ def new_car_dict(self, car):
         'seats': car.seats,
         'location': car.location,
         'cost_per_hour': car.cost_per_hour,
-        'manu_date': car.manu_date
+        'manu_date': car.manu_date,
+        'calendar_id': car.calendar_id
     }
     
     

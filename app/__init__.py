@@ -9,7 +9,9 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from flask_restplus import Api
+
 from app.cloud import * 
+from app._google import create_service
 
 
 # init app and cors
@@ -50,8 +52,18 @@ app_settings = os.getenv(
 app.config.from_object(app_settings)
 
 # declare SQLAlchemy 
-# db = init_connection_engine()
+# db = init_connection_engine() # declare the cloud database connection
 db = SQLAlchemy(app)
+
+
+# Register Google APIs
+CLIENT_SECRET_FILE = 'credentials.json'
+API_NAME = 'calendar'
+API_VERSION = 'v3'
+SCOPES = ['https://www.googleapis.com/auth/calendar']
+# calls will be like this: https://www.googleapis.com/auth/calendar/v3/[your-resources-services], method: [POST,GET,..]
+
+gcalendar_service = create_service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
 
 # register controller blueprints
 from app.apis.auth_method import auth_blueprint
@@ -63,3 +75,6 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(cars_blueprint)
 app.register_blueprint(users_blueprint)
 app.register_blueprint(bookings_blueprint)
+
+
+
