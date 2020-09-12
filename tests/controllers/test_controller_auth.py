@@ -89,7 +89,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(
                 data['message'] == 'User already exists. Please Log in.')
             self.assertTrue(response.content_type == 'application/json')
-            self.assertEqual(response.status_code, 202)
+            self.assertEqual(response.status_code, 500)
 
     def test_registered_user_login(self):
         """ Test for login of registered-user login """

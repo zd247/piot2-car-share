@@ -73,7 +73,7 @@ class TestCarBlueprint(BaseTestCase):
                     Authorization='Bearer ' + data['auth_token']
                 ))
             data = json.loads(response.data.decode())
-            print (data['data']['Subaru1']['calendar_id'])
+            
             self.assertEqual(data['data']['Subaru1']['make'],'Truck')
             self.assertTrue(len(data['data']) == 2)
             self.assertTrue(response.content_type == 'application/json')

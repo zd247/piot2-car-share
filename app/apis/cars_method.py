@@ -213,16 +213,8 @@ class RestfulAPI (MethodView):
                     'message': 'Try again'
                 }
                 return make_response(jsonify(responseObject), 500)  
-            
-class IssueAPI (MethodView):
-    
-    @jwt_required
-    @has_roles(['admin'])  
-    def post(self):
-        """ report an issue with a car as admin or ..."""  
 
 restful_view = RestfulAPI.as_view('restful_api')
-issue_view = IssueAPI.as_view('issue_api')
 
 
 # add Rules for API Endpoints
@@ -236,10 +228,4 @@ cars_blueprint.add_url_rule(
     '/<string:car_name>',
     view_func=restful_view,
     methods=['GET', 'PUT', 'DELETE']
-)
-
-cars_blueprint.add_url_rule(
-    '/issues',
-    view_func=issue_view,
-    methods = ['POST', 'GET']
 )
