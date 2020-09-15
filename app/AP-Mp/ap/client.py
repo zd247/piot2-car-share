@@ -11,8 +11,9 @@ PORT = 12345 # Pick an open Port (1000+ recommended), must match the server port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST,PORT))
 
-target_name = input("enter your device name to verify")
+target_name = 'Xperia'
 target_address = None
+message = none
 
 def lookUpNearbyBluetoothDevices():
  nearby_devices = bluetooth.discover_devices()
@@ -23,9 +24,10 @@ def lookUpNearbyBluetoothDevices():
    target_address = bdaddr
    break
  if target_address is not None:
-  print ("found target bluetooth device with address ", target_address)
+  sendMessageTo("found target bluetooth device with address " + str(target_address))
+  sendMessageTo("Please choose your option: login, bluetooth")
  else:
-  print ("could not find target bluetooth device nearby")
+  print("could not find target bluetooth device nearby")
 
 def receiveMessages():
   server_sock=bluetooth.BluetoothSocket( bluetooth.RFCOMM )
@@ -39,6 +41,7 @@ def receiveMessages():
 
   data = client_sock.recv(1024)
   print("received [%s]" % data)
+  readCommand(data)
 
   client_sock.close()
   server_sock.close()
@@ -47,18 +50,23 @@ def sendMessageTo(message):
  port = 8
  sock=bluetooth.BluetoothSocket( bluetooth.RFCOMM )
  if target_address is not None:
-  sock.connect((target_address, port))
-  sock.send(message)
-  print("Sent")
+    sock.connect((target_address, port))
+    sock.send(message)
+    print("Sent")
  else:
-  print("No device connected")
+     print("No device connected")
  sock.close()
+
+def readCommand(command):
+    if command.lower().strip() == 'bluetooth'
+        message = "MAC:" + target_address
+    if command.lower().strip() == 'login'
+        execfile('03_face_recognition.py')
 
 #Lets loop awaiting for your input
 while True:
 	lookUpNearbyBluetoothDevices()
-
-	encoded = jwt.encode(target_name, key, algorithm='HS256')
+	encoded = jwt.encode(message, key, algorithm='HS256')
 	s.send(encoded)
 	reply = s.recv(1024)
 	reply = jwt.decode(reply, key, algorithms='HS256')

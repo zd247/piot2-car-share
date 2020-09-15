@@ -12,6 +12,8 @@ Modified for Assignment 2
 import cv2
 import numpy as np
 import os
+from client.py import readCommand
+
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read('trainer/trainer.yml')
@@ -34,6 +36,19 @@ cam.set(4, 480) # set video height
 # Define min window size to be recognized as a face
 minW = 0.1*cam.get(3)
 minH = 0.1*cam.get(4)
+
+def decode(im) :
+    # Find barcodes and QR codes
+    decodedObjects = pyzbar.decode(im)
+    # Print results
+    for obj in decodedObjects:
+        print('Type : ', obj.type)
+        print('Data : ', obj.data,'\n')
+		readCommand(obj.data)
+    return decodedObjects
+
+
+font = cv2.FONT_HERSHEY_SIMPLEX
 
 while True:
 

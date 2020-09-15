@@ -8,7 +8,11 @@ Based on original code by Anirban Kar: https://github.com/thecodacus/Face-Recogn
 Developed by Marcelo Rovai - MJRoBot.org @ 21Feb18
 
 '''
-
+from imutils.video import VideoStream
+from pyzbar import pyzbar
+import datetime
+import imutils
+import time
 import cv2
 import os
 
@@ -20,6 +24,7 @@ face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 # For each person, enter one numeric face id
 face_id = input('\n enter user id end press <return> ==>  ')
+found = set()
 
 print("\n [INFO] Initializing face capture. Look the camera and wait ...")
 # Initialize individual sampling face count
@@ -52,4 +57,5 @@ while(True):
 print("\n [INFO] Exiting Program and cleanup stuff")
 cam.release()
 cv2.destroyAllWindows()
+print("\n Starting the training sequence")
 execfile('02_face_training.py')

@@ -23,10 +23,17 @@ try:
 while True:
 	data = conn.recv(1024)
 	decoded = jwt.decode(data, key, algorithms='HS256')
-	if decoded == '': #TODO: enter pin or get mac address from database
-		reply = 'Authenticated'
-	else:
-		reply = 'Access denied'
+	if 'MAC:' in decoded:
+ 		with open('/home/pi/iot/piot2-car-share/app/AP-Mp/mp/macaddress.csv', 'a', newline ='') as file:
+			csv_reader = csv.reader(file, delimiter=',')
+			line_count = 0
+			for macaddress in csv_reader:
+				for i in macaddress:
+					if macaddress[i].strip() == decoded.strip():
+						reply = 'Authenticated'
+					else:
+						reply = 'Access denied'
+
 
 	# Sending reply
 	reply = jwt.encode(reply, key, algorithm='HS256')
