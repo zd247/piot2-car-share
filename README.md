@@ -63,3 +63,7 @@ In the root directory, run:
 `python3 manage.py runserver`
 
 #### Production
+
+`ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`
+
+`pbcopy < ~/.ssh/id_rsa.pub`

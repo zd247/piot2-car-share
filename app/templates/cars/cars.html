@@ -9,7 +9,7 @@
     <h1>Cars</h1>
     <hr>
     <h2>Create New Car:</h2>
-    <form action='/cars' method='POST'>
+    <!-- <form action='/cars' method='POST'>
         Name: <input type='text' name='name' id='name'>
         <br>
         Make: <input type='text' name='make' id='make'>
@@ -26,7 +26,7 @@
         <br>
         
         <input type='submit' value='Create'>
-    </form>
+    </form> -->
     
 
     {% for car in cars %}
@@ -41,8 +41,8 @@
         <h3>{{ car.cost_per_hour }}</h3>
         <h3>{{ car.manu_date }}</h3>
         
-        <a href='/cars/delete/{{car.id}}'>Delete</a>
-        <a href='/cars/edit/{{car.id}}'>Edit</a>
+        <!-- <a href='/cars/delete/{{car.id}}'>Delete</a>
+        <a href='/cars/edit/{{car.id}}'>Edit</a> -->
 
     {% endfor %}
 

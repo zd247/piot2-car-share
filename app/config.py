@@ -1,4 +1,5 @@
 import os
+import datetime
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 postgres_local_base = 'postgresql://postgres:@localhost/'
@@ -27,6 +28,11 @@ class BaseConfig:
     USER_ENABLE_USERNAME = False    # Disable username authentication
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
     USER_EMAIL_SENDER_EMAIL = "piot2@gmail.com"
+    
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1, seconds=1)
 
 
 class DevelopmentConfig(BaseConfig):
@@ -41,7 +47,7 @@ class TestingConfig(BaseConfig):
     DEBUG = True
     TESTING = True
     BCRYPT_LOG_ROUNDS = 4
-    SQLALCHEMY_DATABASE_URI = postgres_local_base + database_name + '-test'
+    SQLALCHEMY_DATABASE_URI = postgres_local_base + database_name + '_test'
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
 
