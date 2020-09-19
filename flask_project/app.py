@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, CheckConstraint, exc, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Float, CheckConstraint, exc, DateTime, Boolean, extract
 from datetime import datetime
 from flask_marshmallow import Marshmallow
+from sqlalchemy.sql.functions import count, Cast, func
 import re, json
 
 # Enter your database connection details below
@@ -114,17 +115,14 @@ class UserSchema(ma.Schema):
         fields = ('email', 'email_confirmed_at', 'password',
                   'registered_on', 'first_name', 'last_name', 'active', 'role')
 
-
 class CarSchema(ma.Schema):
     class Meta:
         fields = ('name', 'make', 'body', 'colour', 'seats',
                   'location', 'cost_per_hour', 'manu_date', 'calendar_id', 'status')
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/customer/home')
 def customer_home():
@@ -173,7 +171,24 @@ def admin_user():
     list = User.query.all()
     user_schema = UserSchema(many=True)
     user_list = user_schema.dump(list)
-    return render_template('test.html', user_list=user_list)
+    return render_template('admin/user.html', user_list=user_list)
+
+@app.route('/admin/car', methods=['GET', 'POST'])
+def admin_car():
+    if request.method == 'POST':
+        try:
+            new_list = request.form['car_data']
+            Car.query.delete()
+            for car in json.loads(new_list):
+                mysql.session.add(Car(car['name'], car['make'], car['body'], car['colour'],
+                                      car['seats'], car['location'], car['cost_per_hour'], car['manu_date']))
+        except exc.SQLAlchemyError as e:
+            mysql.session.rollback()
+    mysql.session.commit()
+    list = Car.query.all()
+    car_schema = CarSchema(many=True)
+    car_list = car_schema.dump(list)
+    return render_template('admin/car.html', car_list=car_list)
 
 @app.route('/engineer/home')
 def engineer_home():
@@ -183,7 +198,13 @@ def engineer_home():
 def manager_home():
     return render_template('manager/home.html')
 
-# http://localhost:5000/ - this will be the login page, we need to use both GET and POST requests
+@app.route('/manager/customer')
+def manager_customer():
+    new_customer_in_6_month = mysql.session.query(Cast(extract('month', User.email_confirmed_at), String), func.count(User.email)).group_by(extract('month', User.email_confirmed_at)).all()
+    car_by_make = mysql.session.query(Car.make, func.count(Car.name)).group_by(Car.make).all()
+    return render_template('manager/customer.html', new_customer_in_6_month=json.dumps(new_customer_in_6_month)
+                                        ,   car_by_make=json.dumps(car_by_make))
+
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
@@ -222,7 +243,7 @@ def logout():
    session.pop('email', None)
    # Redirect to login page
    #  return redirect(url_for('login'))
-   return 'log out successfully!'
+   return redirect(url_for('index'))
 
 # http://localhost:5000/register - this will be the registration page, we need to use both GET and POST requests
 @app.route('/register', methods=['GET', 'POST'])

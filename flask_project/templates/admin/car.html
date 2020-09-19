@@ -10,6 +10,10 @@
     />
     <link
       rel="stylesheet"
+      href="{{ url_for('static', filename='css/sidebar.css') }}"
+    />
+    <link
+      rel="stylesheet"
       href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
       integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
       crossorigin="anonymous"
@@ -17,7 +21,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='car.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/car.js') }}"></script>
     <script type="text/javascript">
       var car_header = [
         "Name",
@@ -41,7 +45,7 @@
         "manu_date",
         "calendar_id",
       ];
-      var car_data = JSON.parse('{{car_list|tojson|safe}}');
+      var car_data = {{car_list|tojson|safe}};
     </script>
   </head>
   <body>
@@ -92,17 +96,18 @@
     </div>
 
     <div class="panel panel-default">
-      <div class="panel-heading display-4"><b> Customer Database </b></div>
+      <div class="panel-heading display-4"><b> Car Database </b></div>
       <div class="text-danger">
         Please make sure there is no duplicate id or email address. Refresh the
         page after saving everything to take effect
       </div>
-  
+
       <div class="panel-body" style="overflow: auto; height: 78vh">
+        <i class="fas fa-search"> Search  </i><input id="myInput" type="text" placeholder="Search..">
         <div class="tbl_car_data"></div>
       </div>
     </div>
-  
+
     <div class="panel panel-default">
       <div class="container">
         <div class="row">
@@ -123,6 +128,27 @@
         </div>
       </div>
     </div>
-    
   </body>
 </html>
+
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <a href="{{url_for('admin_home')}}">Home</a>
+  <a href="{{url_for('admin_user')}}">User List</a>
+  <a href="{{url_for('admin_car')}}">Car List</a>
+  <a href="#">Booking History</a>
+  <a href="{{url_for('logout')}}">Logout</a>
+  <!-- <a href="#">Contact</a> -->
+</div>
+
+<script>
+  function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+    document.body.style.backgroundColor = "rgb(0,0,0,0.4)";
+  }
+
+  function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+    document.body.style.backgroundColor = "white";
+  }
+</script>

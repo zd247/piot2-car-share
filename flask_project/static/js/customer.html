@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <style>
+    .col{
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<h1>My Web Page</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col" id="piechart"></div>
+        <div class="col" id="columnchart"></div>
+        <div class="col" id="piechart"></div>
+        <div class="col" id="piechart"></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+new_customer_in_6_month = [['Month', 'New Customer']].concat(JSON.parse({{new_customer_in_6_month|tojson|safe}}));
+car_by_make = [['Make', 'Number']].concat(JSON.parse({{car_by_make|tojson|safe}}));
+// Load google charts
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawPieChart);
+
+// Draw the chart and set the chart values
+function drawPieChart() {
+
+  console.log(new_customer_in_6_month);
+  var data = google.visualization.arrayToDataTable(car_by_make);
+
+  // Optional; add a title and set the width and height of the chart
+  var options = {'title':'New Customer Year 2020', 'width':550, 'height':400};
+
+  // Display the chart inside the <div> element with id="piechart"
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+  chart.draw(data, options);
+}
+
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawColumnChart);
+
+// Draw the chart and set the chart values
+function drawColumnChart() {
+  var data = google.visualization.arrayToDataTable(new_customer_in_6_month);
+
+  // Optional; add a title and set the width and height of the chart
+  var options = {'title':'New Customer Year 2020', 'width':550, 'height':400};
+
+  // Display the chart inside the <div> element with id="piechart"
+  var chart = new google.visualization.ColumnChart(document.getElementById('columnchart'));
+  chart.draw(data, options);
+}
+</script>
+
+
+</body>
+</html>
