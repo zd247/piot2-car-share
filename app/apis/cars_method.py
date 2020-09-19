@@ -7,7 +7,7 @@ from app import db
 from flask_jwt_extended import jwt_required, get_jwt_claims
 from app.decorator import *
 
-cars_blueprint = Blueprint('cars', __name__, url_prefix="/cars")
+cars_blueprint = Blueprint('cars', __name__, url_prefix="/api/v1/cars")
 
 def new_car_dict(self, car):
     return {

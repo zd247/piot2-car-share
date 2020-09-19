@@ -1,7 +1,7 @@
 import os
 import datetime
 
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, render_template, jsonify, make_response
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -89,5 +89,39 @@ app.register_blueprint(bookings_blueprint)
 app.register_blueprint(emails_blueprint)
 
 
+# Registering html routes here
+@app.route('/')
+def index():
+    return render_template("index.html")
 
 
+@app.route("/convert_to_json", methods=["POST"])
+def convert_to_json():
+
+    req = request.get_json()
+
+    print(req)
+
+    res = make_response(jsonify(req), 200)
+
+    return res
+
+@app.route("/guestbook/create-entry", methods=["POST"])
+def create_entry():
+
+    req = request.get_json()
+
+    print(req)
+
+    res = make_response(jsonify(req), 200)
+
+    return res
+
+#TODO
+# store the access token in browswer cookie
+
+# when an app.route(...) function is fetched, get the access token from the browswer cookie
+
+# there are two ways to work on the access token
+
+# fetch the api/v1 routes with authorization access token passed, if returned request error, display an alert box

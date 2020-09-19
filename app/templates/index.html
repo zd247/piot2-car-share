@@ -1,9 +1,200 @@
-{% extends 'base.html' %}
-
 {% block head %} 
 <title>Home</title>
 {% endblock%}
 
 {% block body %}
-<h1>This is going to be the login/sign up page</h1>
+<div class="container">
+    <div class="row">
+        <div class="col">
+    
+            <h1>CREATE A CAR</h1>
+            <hr>
+        
+            <div class="mb-3">
+                <div class="form-group">
+                    <label>Car name</label>
+                    <input type="text" class="form-control" id="name" placeholder="Car name">
+                </div>
+
+                <div class="form-group">
+                    <label>Make</label>
+                    <input type="text" class="form-control" id="make" placeholder="Make">
+                </div>
+
+                <div class="form-group">
+                    <label>Body</label>
+                    <input type="text" class="form-control" id="body" placeholder="Body">
+                </div>
+
+                <div class="form-group">
+                    <label>Seats    </label>
+                    <input type="number" class="form-control" id="seats" placeholder="Seats">
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" class="form-control" id="location" placeholder="Location">
+                </div>
+
+                <div class="form-group">
+                    <label>Cost</label>
+                    <input type="text" class="form-control" id="cost" placeholder="Cost">
+                </div>
+        
+                <button class="btn btn-primary" id="submit" onclick="submit_message();">Submit message</button>
+
+            </div>
+
+            <hr>
+
+            <h3>Cars</h3>
+            <div class="mb-3" id="cars">
+                {% for car in cars %}
+                    <hr>
+                    <p> {{ car.id }}</p>
+                    <h3>{{ car.name }}</h3>
+                    <h3>{{ car.make }}</h3>
+                    <h3>{{ car.body }}</h3>
+                    <h3>{{ car.colour }}</h3>
+                    <h3>{{ car.seats }}</h3>
+                    <h3>{{ car.location }}</h3>
+                    <h3>{{ car.cost_per_hour }}</h3>
+                    <h3>{{ car.manu_date }}</h3>
+        
+                    <!-- <a href='/cars/delete/{{car.id}}'>Delete</a>
+                    <a href='/cars/edit/{{car.id}}'>Edit</a> -->
+
+                {% endfor %}
+            </div>
+    
+        </div>
+    </div>
+</div>
 {% endblock%}
+
+{% block main %}
+
+<div class="container">
+<div class="row">
+    <div class="col">
+
+    <h1>Guestbook</h1>
+    <hr>
+
+    <div class="mb-3">
+        <div class="form-group">
+        <label>Title</label>
+        <input type="text" class="form-control" id="title" placeholder="Title">
+        </div>
+
+        <div class="form-group">
+        <label>Message</label>
+        <textarea class="form-control" id="message" cols="30" rows="3" placeholder="Your message"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="submit" onclick="submit_message();">Submit message</button>
+    </div>
+
+    <h3>Messages</h3>
+    <hr>
+
+    <div class="mb-3" id="messages"></div>
+
+    </div>
+</div>
+</div>
+
+{% endblock %}
+
+
+
+{% block script %}
+
+<script>
+
+    function submit_message() {
+
+        var title = document.getElementById("title");
+        var message = document.getElementById("message");
+
+        var entry = {
+        title: title.value,
+        message: message.value
+        };
+
+        fetch(`${window.origin}/guestbook/create-entry`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(entry),
+        cache: "no-cache",
+        headers: new Headers({
+            "content-type": "application/json"
+        })
+        })
+        .then(function (response) {
+            if (response.status !== 200) {
+            console.log(`Looks like there was a problem. Status code: ${response.status}`);
+            return;
+            }
+            response.json().then(function (data) {
+            console.log(data);
+            });
+        })
+        .catch(function (error) {
+            console.log("Fetch error: " + error);
+        });
+
+    }
+
+
+    function submit_car() {
+
+        let name = document.getElementById("name");
+        let make = document.getElementById("make");
+        let body = document.getElementById("body");
+        let colour = document.getElementById("colour");
+        let seats = document.getElementById("seats");
+        let location = document.getElementById("location");
+        let cost_per_hour = document.getElementById("cost_per_hour");
+        let manu_date = document.getElementById("manu_date");
+
+        let post_data = {
+            name: name.value,
+            make: make.value,
+            body: body.value,
+            colour: colour.value,
+            seats: seats.value,
+            location: location.value,
+            cost_per_hour: cost_per_hour.value,
+            manu_date: manu_date.value,
+        };
+
+        console.log ("pressed")
+
+        // fetch(`${window.origin}/api/v1/cars`, {
+
+        fetch(`${window.origin}/convert/to_json`, {
+            method: "POST",
+            credentials: "include",
+            body: JSON.stringify(post_data),
+            cache: "no-cache",
+            headers: new Headers({
+                    "content-type": "application/json",
+                })
+            }).then(function (response) {
+                if (response.status !== 200) {
+                    console.log(`Looks like there was a problem. Status code: ${response.status}`);
+                    return;
+                }
+                response.json().then(function (data) {
+                    console.log(data);
+                });
+            })
+            .catch(function (error) {
+                console.log("Fetch error: " + error);
+            });
+    }
+
+</script>
+
+{% endblock %}

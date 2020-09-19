@@ -16,7 +16,7 @@ from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 get_jwt_claims, get_raw_jwt)
 
 
-auth_blueprint = Blueprint('auth', __name__, url_prefix="/auth")
+auth_blueprint = Blueprint('auth', __name__, url_prefix="/api/v1/auth")
 
 class RegisterAPI(MethodView):
     """

@@ -19,7 +19,7 @@ def seed_car(self):
 
 def register_user(self, email, password, first_name, last_name, role=None) :
     return self.client.post(
-        '/auth/register',
+        '/api/v1/auth/register',
         data=json.dumps(dict(
             email=email,
             password=password,
@@ -32,7 +32,7 @@ def register_user(self, email, password, first_name, last_name, role=None) :
 
 def login_user(self, email, password):
     return self.client.post(
-        '/auth/login',
+        '/api/v1/auth/login',
         data=json.dumps(dict(
             email=email,
             password=password
@@ -67,7 +67,7 @@ class TestCarBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             
             # api calls 
-            response = self.client.get('/cars',
+            response = self.client.get('/api/v1/cars',
                     content_type='application/json',
                     headers=dict(
                     Authorization='Bearer ' + data['auth_token']
@@ -111,7 +111,7 @@ class TestCarBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             
             # perform api call
-            response = self.client.get('/cars/Subaru1',
+            response = self.client.get('/api/v1/cars/Subaru1',
                     content_type='application/json',
                     headers=dict(
                     Authorization='Bearer ' + data['auth_token']
@@ -150,7 +150,7 @@ class TestCarBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             
             response = self.client.post(
-                '/cars',
+                '/api/v1/cars',
                 data=json.dumps(dict(
                     name='Test',
                     make='Test',
@@ -208,7 +208,7 @@ class TestCarBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             # invoke put request to client with new body being passed
             response = self.client.put (
-                '/cars/Honda1',
+                '/api/v1/cars/Honda1',
                 data = json.dumps(dict(
                     name='Honda1',
                     make='Test',
@@ -262,6 +262,7 @@ class TestCarBlueprint(BaseTestCase):
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
+            
             # registered user login
             response = login_user(self, 'joe@gmail.com', '123456')
             data = json.loads(response.data.decode())
@@ -272,7 +273,7 @@ class TestCarBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             
             response = self.client.delete(
-                '/cars/Honda1',
+                '/api/v1/cars/Honda1',
                 headers=dict(
                     Authorization='Bearer ' + data['auth_token']
                 )
