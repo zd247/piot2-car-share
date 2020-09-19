@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+<title>Log in</title>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-register my-5">
+          <div class="card-body">
+            <h5 class="card-title text-center">Register</h5>
+            <form class="form-register" action="{{ url_for('register') }}" method="POST">
+              <div class="container">
+                <div class="row">
+                  <div class="col-sm">
+                    <div class="form-label-group">
+                      <input type="fname" id="fname" name="fname" class="form-control" placeholder="First Name" required>
+                      <label for="fname">First Name</label>
+                  </div>
+                  </div>
+                  <div class="col-sm">
+                    <div class="form-label-group">
+                      <input type="lname" id="lname" name="lname" class="form-control" placeholder="Last Name" required>
+                      <label for="lname">Last Name</label>
+                  </div>
+                  </div>
+                </div>
+                </div>
+                <div class="form-label-group">
+                    <input type="date" id="birth" name="birth" class="form-control" placeholder="mm/dd/yyyy" required>
+                    <label for="birth">Birth</label>
+                </div>
+                 <div class="form-label-group">
+                <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required autofocus>
+                <label for="email">Email address</label>
+              </div>
+              <div class="form-label-group">
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                <label for="password">Password</label>
+              </div>
+              <div class="form-check-inline">
+                <label class="form-check-label">
+                  <input type="radio" class="form-check-input" name="role" value="Customer">Customer
+                </label>
+              </div>
+              <div class="form-check-inline">
+                <label class="form-check-label">
+                  <input type="radio" class="form-check-input" name="role" value="Admin">Admin
+                </label>
+              </div>
+              <div class="form-check-inline">
+                <label class="form-check-label">
+                  <input type="radio" class="form-check-input" name="role" value="Manager">Manager
+                </label>
+              </div>
+              <div class="form-check-inline">
+                <label class="form-check-label">
+                  <input type="radio" class="form-check-input" name="role" value="Engineer">Engineer
+                </label>
+              </div>
+              <div class="msg" style="color: red;">{{ msg }}</div>
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Register</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
