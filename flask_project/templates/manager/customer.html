@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <style>
+    .col{
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<h1>My Web Page</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col" id="piechart"></div>
+        <div class="col" id="columnchart"></div>
+        <div class="col" id="piechart"></div>
+        <div class="col" id="piechart"></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+// Load google charts
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawPieChart);
+
+// Draw the chart and set the chart values
+function drawPieChart() {
+  var data = google.visualization.arrayToDataTable([
+  ['Month', 'New Customer'],
+  ['Jan', 8],
+  ['Feb', 1],
+  ['Mar', 4],
+  ['Apr', 2],
+  ['May', 7],
+  ['Jun', 4],
+  ['Jul', 5],
+  ['Aug', 8],
+  ['Sep', 9],
+]);
+
+  // Optional; add a title and set the width and height of the chart
+  var options = {'title':'New Customer Year 2020', 'width':550, 'height':400};
+
+  // Display the chart inside the <div> element with id="piechart"
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+  chart.draw(data, options);
+}
+
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawColumnChart);
+
+// Draw the chart and set the chart values
+function drawColumnChart() {
+  var data = google.visualization.arrayToDataTable([
+  ['Month', 'New Customer'],
+  ['Jan', 8],
+  ['Feb', 1],
+  ['Mar', 4],
+  ['Apr', 2],
+  ['May', 7],
+  ['Jun', 4],
+  ['Jul', 5],
+  ['Aug', 8],
+  ['Sep', 9],
+]);
+
+  // Optional; add a title and set the width and height of the chart
+  var options = {'title':'New Customer Year 2020', 'width':550, 'height':400};
+
+  // Display the chart inside the <div> element with id="piechart"
+  var chart = new google.visualization.ColumnChart(document.getElementById('columnchart'));
+  chart.draw(data, options);
+}
+</script>
+
+
+</body>
+</html>

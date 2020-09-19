@@ -1,0 +1,69 @@
+<!-- <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css"
+/> -->
+<link
+  rel="stylesheet"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='test.js') }}"></script>
+//TODO change this
+
+<script type="text/javascript">
+  var user_header = [
+    "Email",
+    "Email confirmed at",
+    "Password",
+    "Registered on",
+    "First name",
+    "Last name",
+    "Active",
+    "Role",
+  ]; //TODO change data from here
+  var user_key = [
+    "email",
+    "email_confirmed_at",
+    "password",
+    "registered_on",
+    "first_name",
+    "last_name",
+    "active",
+    "role",
+  ];
+  var user_data = JSON.parse('{{user_list|tojson|safe}}');
+</script>
+
+<body>
+  <div class="panel panel-default">
+    <div class="panel-heading display-4"><b> Customer Database </b></div>
+    <div class="text-danger">
+      Please make sure there is no duplicate id or email address. Refresh the page
+      after saving everything to take effect
+    </div>
+  
+    <div class="panel-body" style="overflow: auto; height: 78vh">
+      <i class="fas fa-search"> Search </i><input id="myInput" type="text" placeholder="Search..">
+      <div class="tbl_user_data"></div>
+    </div>
+  </div>
+  
+  <div class="panel panel-default">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6 text-center" id="save_button">
+          <span class="btn_save_all">
+            <a href="#" class="btn btn-primary" row_id="">
+              Save All Changes
+            </a></span
+          >
+        </div>
+        <div class="col-sm-6 text-center" id="add_button">
+          <span class="btn_add">
+            <a href="#" class="btn btn-primary" row_id=""> Add A Record </a></span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</body>

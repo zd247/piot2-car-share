@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+      integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='car.js') }}"></script>
+    <script type="text/javascript">
+      var car_header = [
+        "Name",
+        "Make",
+        "Body",
+        "Colour",
+        "Seats",
+        "Location",
+        "Cost per hour",
+        "Manufacture date",
+        "Calendar ID",
+      ]; //TODO change data from here
+      var car_key = [
+        "name",
+        "make",
+        "body",
+        "colour",
+        "seats",
+        "location",
+        "cost_per_hour",
+        "manu_date",
+        "calendar_id",
+      ];
+      var car_data = JSON.parse('{{car_list|tojson|safe}}');
+    </script>
+  </head>
+  <body>
+    <div class="modal fade" id="myModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Report Car Issue</h4>
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-6" id="car_id">Car ID: 1</div>
+                <div class="col-sm-6" id="car_name">Car Name: abc</div>
+                <label class="m-3">Issues</label>
+                <!-- <input type="email" class="form-control" id="email" placeholder="email"> -->
+                <textarea
+                  class="form-control"
+                  rows="6"
+                  id="report_area"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-dismiss="modal"
+              id="submit_button"
+            >
+              Submit
+            </button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading display-4"><b> Customer Database </b></div>
+      <div class="text-danger">
+        Please make sure there is no duplicate id or email address. Refresh the
+        page after saving everything to take effect
+      </div>
+  
+      <div class="panel-body" style="overflow: auto; height: 78vh">
+        <div class="tbl_car_data"></div>
+      </div>
+    </div>
+  
+    <div class="panel panel-default">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6 text-center" id="save_button">
+            <span class="btn_save_all">
+              <a href="#" class="btn btn-primary" row_id="">
+                Save All Changes
+              </a></span
+            >
+          </div>
+          <div class="col-sm-6 text-center" id="add_button">
+            <span class="btn_add">
+              <a href="#" class="btn btn-primary" row_id="">
+                Add A Record
+              </a></span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </body>
+</html>
