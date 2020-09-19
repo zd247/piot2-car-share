@@ -88,6 +88,7 @@ app.register_blueprint(users_blueprint)
 app.register_blueprint(bookings_blueprint)
 app.register_blueprint(emails_blueprint)
 
+#===================[Routing]========================
 
 # Registering html routes here
 @app.route('/')

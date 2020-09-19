@@ -13,6 +13,8 @@ class BaseConfig:
     BCRYPT_LOG_ROUNDS = 13
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    
+    
     # Flask-Mail SMTP server settings
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
@@ -31,6 +33,20 @@ class BaseConfig:
     
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    
+    # Configure application to store JWTs in cookies. Whenever you make
+    # a request to a protected endpoint, you will need to send in the
+    # access or refresh JWT via a cookie.
+    JWT_TOKEN_LOCATION = ['cookies']
+    
+    # # Set the cookie paths, so that you are only sending your access token
+    # # cookie to the access endpoints, and only sending your refresh token
+    # # to the refresh endpoint.
+    # JWT_ACCESS_COOKIE_PATH = '/api/'
+    # JWT_REFRESH_COOKIE_PATH = '/token/refresh'
+    
+    # This is a bad practice, not suppose to do this.
+    JWT_COOKIE_CSRF_PROTECT = False
     
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1, seconds=1)
 

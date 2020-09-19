@@ -13,6 +13,7 @@ from flask_user import current_user, login_required, roles_required, UserManager
 
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 jwt_required, jwt_refresh_token_required, get_jwt_identity,
+                                set_access_cookies, set_refresh_cookies,
                                 get_jwt_claims, get_raw_jwt)
 
 
@@ -183,9 +184,13 @@ class RefreshAPI(MethodView):
     @jwt_refresh_token_required
     def post (self):
         current_user = get_jwt_identity()
+        access_token = create_access_token(identity=current_user)
+        
+        resp = jsonify({'refresh': True})
         ret = {
-            'auth_token': create_access_token(identity=current_user)
+            'auth_token': access_token
         }
+        set_access_cookies(resp, access_token)
         return jsonify(ret), 200
         
     
