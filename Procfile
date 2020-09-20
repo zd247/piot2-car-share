@@ -1,3 +1,3 @@
-web: gunicorn gettingstarted.wsgi --log-file -
+web: gunicorn app:manage
 
 web: python manage.py runserver 0.0.0.0:5000
