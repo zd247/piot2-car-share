@@ -97,4 +97,19 @@ html {
        font-size: 3em;
     }
  }
+
+#myTable {
+  width: 90vw;
+}
+
+#myTable td input {
+  width: 100%;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+#myTable td,th {
+  width:1px;
+  white-space:nowrap;
+}
   

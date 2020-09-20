@@ -23,8 +23,8 @@
   </header>
     <div class="container">
       <div class="row">
-        <div class="col" id="columnchart1" style="width: 30vw;"></div>
-        <div class="col" id="columnchart2" style="width: 30vw;"></div>
+        <div class="col" id="piechart1" style="width: 30vw;"></div>
+        <div class="col" id="piechart2" style="width: 30vw;"></div>
       </div>
     </div>
     <script
@@ -32,37 +32,37 @@
       src="https://www.gstatic.com/charts/loader.js"
     ></script>
     <script type="text/javascript">
-      new_customer_in_6_month = [['Month', 'New Customer']].concat(JSON.parse({{new_customer_in_6_month|tojson|safe}}));
+      car_by_make = [['Car', 'Brand']].concat(JSON.parse({{car_by_make|tojson|safe}}));
       // Load google charts
       google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawColumnChart1);
+      google.charts.setOnLoadCallback(drawPieChart1);
 
       // Draw the chart and set the chart values
-      function drawColumnChart1() {
+      function drawPieChart1() {
 
-        console.log(new_customer_in_6_month);
-        var data = google.visualization.arrayToDataTable(new_customer_in_6_month);
+        console.log(car_by_make);
+        var data = google.visualization.arrayToDataTable(car_by_make);
 
         // Optional; add a title and set the width and height of the chart
         var options = {'title':'New Customer The Last 6 Months', 'width':550, 'height':400};
 
-        // Display the chart inside the <div> element with id="columnchart"
-        var chart = new google.visualization.ColumnChart(document.getElementById('columnchart1'));
+        // Display the chart inside the <div> element with id="piechart"
+        var chart = new google.visualization.PieChart(document.getElementById('piechart1'));
         chart.draw(data, options);
       }
-      customer_booking_in_6_month = [['Month', 'Booking']].concat(JSON.parse({{customer_booking_in_6_month|tojson|safe}}));
+      car_make_booked = [['Month', 'Booking']].concat(JSON.parse({{car_make_booked|tojson|safe}}));
       google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawColumnChart2);
+      google.charts.setOnLoadCallback(drawPieChart2);
 
       // Draw the chart and set the chart values
-      function drawColumnChart2() {
-        var data = google.visualization.arrayToDataTable(customer_booking_in_6_month);
+      function drawPieChart2() {
+        var data = google.visualization.arrayToDataTable(car_make_booked);
 
         // Optional; add a title and set the width and height of the chart
         var options = {'title':'Customer Booking Statistic The Last 6 Months', 'width':550, 'height':400};
 
-        // Display the chart inside the <div> element with id="columnchart"
-        var chart = new google.visualization.ColumnChart(document.getElementById('columnchart2'));
+        // Display the chart inside the <div> element with id="piechart"
+        var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
         chart.draw(data, options);
       }
     </script>
@@ -74,8 +74,8 @@
     >&times;</a
   >
   <a href="{{url_for('manager_home')}}">Home</a>
-  <a href="" style="color: white;">New customer statistic</a>
-  <a href="{{url_for('manager_car')}}">Car statistic</a>
+  <a href="{{url_for('manager_customer')}}">New customer statistic</a>
+  <a href="" style="color: white;"">Car statistic</a>
   <a href="{{url_for('logout')}}">Logout</a>
 </div>
 
