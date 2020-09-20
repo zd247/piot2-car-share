@@ -61,18 +61,9 @@
               <td>{{car_info.cost_per_hour}}</td>
               <td>{{car_info.manu_date}}</td>
               <td>
-                {% if car_info.status == 'Available' %}
-                <a
-                  href="{{ url_for('customer_booking', name=car_info.name) }}"
-                  class="btn btn-outline-dark"
-                  role="button"
-                  >Select</a
-                >
-                {% else %}
-                <a href="#" class="btn btn-outline-dark disabled" role="button"
-                  >Select</a
-                >
-                {% endif %}
+                <button class="btn btn-outline-dark" type="submit" id="select_book_car">Select</button>
+                
+                
               </td>
             </tr>
             {% endfor %}
@@ -113,6 +104,39 @@
 </div>
 
 <script>
+  const acessToken = document.cookie
+                      .split('; ')
+                      .find(row => row.startsWith('access_token'))
+                      .split('=')[1];
+ 
+  function book_a_car() {
+    authorization = "Bearer " + accessToken
+
+    alert (authorization)
+  
+    // TODO: fix this
+    fetch(`${window.origin}/api/v1/bookings/Honda12`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify(post_data),
+      cache: "no-cache",
+      headers: new Headers({
+          "content-type": "application/json",
+          "Authorization": authorization
+        })
+      })
+      .then(function (response) {
+          response.json().then(function (data) {
+            alert("Car book with data: " + data);
+          });
+      })
+      .catch(function (error) {
+          alert("Fetch error: " + error);
+      });
+  }
+
+  document.getElementById("select_book_car").addEventListener("click", book_a_car);
+
   function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
     document.body.style.backgroundColor = "rgb(0,0,0,0.4)";
@@ -122,5 +146,6 @@
     document.getElementById("mySidenav").style.width = "0";
     document.body.style.backgroundColor = "white";
   }
+
 </script>
 {% endblock %}

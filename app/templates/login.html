@@ -22,12 +22,11 @@
                 <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
                 <label for="password">Password</label>
               </div>
-              <div class="msg" style="color: red;">{{ msg }}</div>
               <div class="custom-control custom-checkbox mb-3">
                 <input type="checkbox" class="custom-control-input" id="customCheck1">
                 <label class="custom-control-label" for="customCheck1">Remember password</label>
               </div>
-              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign in</button>
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" id="login_submit_btn">Sign in</button>
               <hr class="my-4">
               <a href="{{ url_for('register') }}">Does not have an account? Register now!</a>
               <button class="btn btn-lg btn-google btn-block text-uppercase" type="submit"><i class="fab fa-google mr-2"></i> Sign in with Google</button>
@@ -38,4 +37,40 @@
       </div>
     </div>
   </div>
+
+  <script>
+    let URL = 'http://localhost:5000'
+
+    function signIn() {
+      let email = document.getElementById('email')
+      let password = document.getElementById('password')
+  
+      let post_data = {
+        email: email.value,
+        password: password.value
+      }
+  
+      fetch(`${window.origin}/api/v1/auth/login`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(post_data),
+        cache: "no-cache",
+        headers: new Headers({
+            "content-type": "application/json"
+          })
+        })
+        .then(function (response) {
+            
+            response.json().then(function (data) {
+              window.location.replace(URL + "/login_redirect");
+            });
+        })
+        .catch(function (error) {
+            alert("Fetch error: " + error);
+        });
+  
+    }
+    document.getElementById("login_submit_btn").addEventListener("click", signIn);
+  </script>
+  
 {% endblock %}

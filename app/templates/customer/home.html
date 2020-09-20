@@ -27,6 +27,7 @@
                     <canvas id="demo-canvas"></canvas>
                     <h1 class="main-title">
             <span>Welcome back Customer</span><br />{{email}}
+            <p id = "user_email"></p>
           </h1>
         </div>
       </div>
@@ -59,6 +60,12 @@
 </div>
 
 <script>
+  const cookieValue = document.cookie
+                      .split('; ')
+                      .find(row => row.startsWith('email'))
+                      .split('=')[1];
+  document.getElementById("user_email").innerHTML = cookieValue
+
   function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
     document.body.style.backgroundColor = "rgb(0,0,0,0.4)";

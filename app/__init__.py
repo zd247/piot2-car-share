@@ -13,6 +13,10 @@ from flask_restplus import Api
 from app.cloud import * 
 from app._google import create_service
 
+import requests
+import json
+import os
+import time
 
 # init app and cors
 app = Flask(__name__, instance_relative_config=True)
@@ -85,8 +89,6 @@ from app.models.car import Car
 from app.models.user import User
 from sqlalchemy import exc, extract
 from sqlalchemy.sql.functions import count, Cast, func
-import json
-import re
 
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(cars_blueprint)
@@ -95,34 +97,6 @@ app.register_blueprint(bookings_blueprint)
 app.register_blueprint(emails_blueprint)
 
 #===================[Routing]========================
-
-# Registering html routes here
-@app.route('/')
-def index():
-    return render_template("index.html")
-
-
-@app.route("/convert_to_json", methods=["POST"])
-def convert_to_json():
-
-    req = request.get_json()
-
-    print(req)
-
-    res = make_response(jsonify(req), 200)
-
-    return res
-
-@app.route("/guestbook/create-entry", methods=["POST"])
-def create_entry():
-
-    req = request.get_json()
-
-    print(req)
-
-    res = make_response(jsonify(req), 200)
-
-    return res
 
 #TODO
 # store the access token in browswer cookie
@@ -134,30 +108,25 @@ def create_entry():
 # fetch the api/v1 routes with authorization access token passed, if returned request error, display an alert box
 
 
-//TODO move history to another directory
-# class History(db.Model):
-#     __tablename__ = 'history'
-#     email = Column(String(255), nullable=False, unique=True, primary_key=True)
-#     car = Column(String(100), primary_key=True,
-#                       nullable=False, unique=True)
-#     rent_date = Column(DateTime, nullable=False)
-#     return_date = Column(DateTime, nullable=False)
-#     verify_date = Column(DateTime, nullable=False)
-
-#     def __init__(self, email, car, rent_date, return_date):
-#         self.email = email
-#         self.car = car
-#         self.rent_date = rent_date
-#         self.return_date = return_date
-#         self.verify_date = datetime.now()
+API_ROUTE = 'http://127.0.0.1:5000/api/v1/'
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/login_redirect')
+def login_redirect():
+    role = request.cookies.get('role')
+    if (role == 'customer'):
+        return redirect(url_for('customer_home'))
+    elif role == 'manager':
+        return "ok"
+    return "redirecting"
+
 @app.route('/customer/home')
 def customer_home():
     return render_template('customer/home.html')
+
 
 
 @app.route('/customer/car')
@@ -166,104 +135,77 @@ def customer_car():
     return render_template('customer/car.html', car_list=car_list)
 
 
-@app.route('/customer/booking/<name>', methods=['GET', 'POST'])
+@app.route('/customer/booking/', methods=['GET'])
 def customer_booking(name):
-    # print(name)
-    email = session['email']
-    # return render_template('customer/booking.html')
-    if request.method == 'GET':
-        return render_template('customer/booking.html',email=email, car_name=name)
-    else:
-        rent_date = request.form['rent_date']
-        return_date = request.form['return_date']
-        if datetime.strptime(rent_date, '%Y-%m-%d') > datetime.today() or datetime.strptime(rent_date, '%Y-%m-%d') > datetime.strptime(return_date, '%Y-%m-%d'):
-            return render_template('customer/booking.html',msg='Invalid date',email=email, car_name=name)
-        else:
-            db.session.add(History(email, name, rent_date, return_date))
-            db.session.commit()
-    return redirect(url_for('customer_home'))
+   
+    return render_template('customer/booking.html')
+    # else:
+    #     rent_date = request.form['rent_date']
+    #     return_date = request.form['return_date']
+    #     if datetime.strptime(rent_date, '%Y-%m-%d') > datetime.today() or datetime.strptime(rent_date, '%Y-%m-%d') > datetime.strptime(return_date, '%Y-%m-%d'):
+    #         return render_template('customer/booking.html',msg='Invalid date',email=email, car_name=name)
+    #     else:
+    #         db.session.add(History(email, name, rent_date, return_date))
+    #         db.session.commit()
+    # return redirect(url_for('customer_home'))
 
-@app.route('/admin/home')
-def admin_home():
-    return render_template('admin/home.html')
+# @app.route('/admin/home')
+# def admin_home():
+#     return render_template('admin/home.html')
 
-@app.route('/admin/user', methods=['GET', 'POST'])
-def admin_user():
-    if request.method == 'POST':
-        try:
-            new_list = request.form['user_data']
-            User.query.delete()
-            for user in json.loads(new_list):
-                db.session.add(User(
-                    user['email'], user['password'], user['first_name'], user['last_name'], user['role']))
-        except exc.SQLAlchemyError as e:
-            db.session.rollback()
-    db.session.commit()
-    list = User.query.all()
-    user_schema = UserSchema(many=True)
-    user_list = user_schema.dump(list)
-    return render_template('admin/user.html', user_list=user_list)
+# @app.route('/admin/user', methods=['GET', 'POST'])
+# def admin_user():
+#     if request.method == 'POST':
+#         try:
+#             new_list = request.form['user_data']
+#             User.query.delete()
+#             for user in json.loads(new_list):
+#                 db.session.add(User(
+#                     user['email'], user['password'], user['first_name'], user['last_name'], user['role']))
+#         except exc.SQLAlchemyError as e:
+#             db.session.rollback()
+#     db.session.commit()
+#     list = User.query.all()
+#     user_schema = UserSchema(many=True)
+#     user_list = user_schema.dump(list)
+#     return render_template('admin/user.html', user_list=user_list)
 
-@app.route('/admin/car', methods=['GET', 'POST'])
-def admin_car():
-    if request.method == 'POST':
-        try:
-            new_list = request.form['car_data']
-            Car.query.delete()
-            for car in json.loads(new_list):
-                db.session.add(Car(car['name'], car['make'], car['body'], car['colour'],
-                                      car['seats'], car['location'], car['cost_per_hour'], car['manu_date']))
-        except exc.SQLAlchemyError as e:
-            db.session.rollback()
-    db.session.commit()
-    list = Car.query.all()
-    car_schema = CarSchema(many=True)
-    car_list = car_schema.dump(list)
-    return render_template('admin/car.html', car_list=car_list)
+# @app.route('/admin/car', methods=['GET', 'POST'])
+# def admin_car():
+#     if request.method == 'POST':
+#         try:
+#             new_list = request.form['car_data']
+#             Car.query.delete()
+#             for car in json.loads(new_list):
+#                 db.session.add(Car(car['name'], car['make'], car['body'], car['colour'],
+#                                       car['seats'], car['location'], car['cost_per_hour'], car['manu_date']))
+#         except exc.SQLAlchemyError as e:
+#             db.session.rollback()
+#     db.session.commit()
+#     list = Car.query.all()
+#     car_schema = CarSchema(many=True)
+#     car_list = car_schema.dump(list)
+#     return render_template('admin/car.html', car_list=car_list)
 
-@app.route('/engineer/home')
-def engineer_home():
-    return render_template('engineer/home.html')
+# @app.route('/engineer/home')
+# def engineer_home():
+#     return render_template('engineer/home.html')
 
-@app.route('/manager/home')
-def manager_home():
-    return render_template('manager/home.html')
+# @app.route('/manager/home')
+# def manager_home():
+#     return render_template('manager/home.html')
 
-@app.route('/manager/customer')
-def manager_customer():
-    new_customer_in_6_month = db.session.query(Cast(extract('month', User.email_confirmed_at), String), func.count(User.email)).group_by(extract('month', User.email_confirmed_at)).all()
-    car_by_make = db.session.query(Car.make, func.count(Car.name)).group_by(Car.make).all()
-    return render_template('manager/customer.html', new_customer_in_6_month=json.dumps(new_customer_in_6_month)
-                                        ,   car_by_make=json.dumps(car_by_make))
+# @app.route('/manager/customer')
+# def manager_customer():
+#     new_customer_in_6_month = db.session.query(Cast(extract('month', User.email_confirmed_at), String), func.count(User.email)).group_by(extract('month', User.email_confirmed_at)).all()
+#     car_by_make = db.session.query(Car.make, func.count(Car.name)).group_by(Car.make).all()
+#     return render_template('manager/customer.html', new_customer_in_6_month=json.dumps(new_customer_in_6_month)
+#                                         ,   car_by_make=json.dumps(car_by_make))
 
-@app.route('/login/', methods=['GET', 'POST'])
+
+@app.route('/login/', methods=['GET'])
 def login():
-    # Output message if something goes wrong...
-    msg = ''
-        # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
-        # Create variables for easy access
-        email = request.form['email']
-        password = request.form['password']
-    
-        account = User.query.filter_by(email=email, password=password).first()
-
-        # If account exists in accounts table in out database
-        if (account):
-            # Create session data, we can access this data in other routes
-            session['loggedin'] = True
-            session['email'] = account.email
-            session['role'] = account.role
-            # Redirect to home page
-            # template = account.role.lower() + '/home.html'
-            template = account.role.lower() + '_home'
-            # return render_template(template, email=session['email'])
-            return redirect(url_for(template))
-        else:
-            # Account doesnt exist or username/password incorrect
-            msg = 'Incorrect Email/password!'
-
-    return render_template('login.html', msg=msg)
+    return render_template('login.html')
 
 # http://localhost:5000/login/logout - this will be the logout page
 @app.route('/login/logout')

@@ -77,9 +77,6 @@ class RegisterAPI(MethodView):
             }
             return make_response(jsonify(responseObject)), 500
 
-    def get(self):
-        return "ok"
-
 class LoginAPI(MethodView):
     """
     User Login Resource
@@ -105,15 +102,20 @@ class LoginAPI(MethodView):
                 access_token = create_access_token(identity=post_data)
                 refresh_token = create_refresh_token(identity=post_data)
                 
-                
                 responseObject = {
                     'status': 'success',
                     'message': 'Successfully logged in.',
                     'auth_token': access_token,
                     'role': user.role
                 }
+                response = make_response(jsonify(responseObject))
                 
-                return make_response(jsonify(responseObject)), 200
+                
+                response.set_cookie('role',user.role)
+                response.set_cookie('acess_token',access_token)
+                response.set_cookie('email', str(user.email))
+                
+                return response, 200
             else:
                 responseObject = {
                     'status': 'fail',
