@@ -1,7 +1,7 @@
 $(document).ready(function ($) {
   //TODO change these table header
   var tbl = "";
-  tbl += '<table class="table table-hover m-auto" id="myTable">';
+  tbl += '<table class="table table-hover table-bordered m-auto" id="myTable">';
 
   tbl += "<thead>";
   tbl += "<tr>";
