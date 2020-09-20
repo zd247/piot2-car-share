@@ -49,7 +49,7 @@ class User(mysql.Model):
     # roles = relationship('Role', secondary='user_roles')
     role = Column(String(30), nullable=False, server_default='user')
 
-    def __init__(self, email, password, first_name, last_name, role, email_confirmed_at=datetime.now(), registered_on=datetime.now(), active=True):
+    def __init__(self, email, password, first_name, last_name, role, email_confirmed_at=datetime.now(), registered_on=datetime.now(), active=True): //TODO chage this
         self.email = email
         self.email_confirmed_at = email_confirmed_at
         self.password = password
@@ -77,7 +77,7 @@ class Car(mysql.Model):
     status = Column(String(20), CheckConstraint(
         'status="Available" or status="Unavailable"'))
 
-    def __init__(self, name, make, body, colour, seats, location, cost_per_hour, manu_date, calendar_id="created calendar", status="Available"):
+    def __init__(self, name, make, body, colour, seats, location, cost_per_hour, manu_date, calendar_id="created calendar", status="Available"): //TODO change this
         self.name = name
         self.make = make
         self.body = body
