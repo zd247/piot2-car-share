@@ -23,6 +23,8 @@
 
 `pip install Flask-Testing`
 
+`pip install flask-marshmallow`
+
 In PostgreSQL or database of choice, create 2 tables for test and development
 
 `create database piot2;`

@@ -64,11 +64,11 @@
             response.json().then(function (data) {
               let statusData = JSON.stringify(data.status).replace(/^"(.*)"$/, '$1');
               if (statusData === 'success') {
+                // create new history here
                 window.location.replace(URL + "/login_redirect");
               }else {
                 alert (JSON.stringify(data))
               }
-  
             });
         })
         .catch(function (error) {

@@ -6,9 +6,9 @@ from app import db
 
 class History(db.Model):
     __tablename__ = 'history'
-    email = db.Column(db.String(255), nullable=False, unique=True, primary_key=True)
+    event_id = db.Column(db.String(255), nullable=False, unique=True, primary_key=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
     car = db.Column(db.String(100), nullable=False, unique=True)
-    event_id = db.Column(db.String(255), nullable=False, unique=True)
     rent_date = db.Column(db.DateTime, nullable=False)
     return_date = db.Column(db.DateTime, nullable=False)
     verify_date = db.Column(db.DateTime, nullable=False)

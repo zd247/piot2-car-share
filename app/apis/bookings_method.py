@@ -127,7 +127,7 @@ class BookingAPI (MethodView):
           
     
     def put (self, car_name, event_id):
-        """ As a current user, create an event from the car's calendar id """ 
+        """ As a current user, edit an event from the car's calendar id """ 
         try:
             put_data = request.get_json()
                 
