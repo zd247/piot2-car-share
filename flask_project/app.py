@@ -107,9 +107,25 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/customer/cancel')
+def customer_cancel():
+    email = session['email']
+    history = History.query.filter(History.return_date>=datetime.now()).filter_by(email=email).first()
+    booked_car = Car.query.filter_by(name=history.car).first()
+    booked_car.status = 'Available'
+    mysql.session.commit()
+    return redirect(url_for('customer_home'))
+
 @app.route('/customer/home')
 def customer_home():
-    return render_template('customer/home.html')
+    msg = ""
+    email = session['email']
+    history = History.query.filter(History.return_date>=datetime.now()).filter_by(email=email).first()
+    if history:
+        booked_car = Car.query.filter_by(name=history.car).first()
+        if booked_car.status == 'Unavailable':
+            msg = "You are currently booking " + booked_car.name + " until " + history.return_date.strftime('%d/%m/%Y')
+    return render_template('customer/home.html', email=email, msg=msg)
 
 
 @app.route('/customer/car')
@@ -132,6 +148,8 @@ def customer_booking(name):
             return render_template('customer/booking.html', msg='Invalid date', email=email, car_name=name)
         else:
             mysql.session.add(History(email, name, rent_date, return_date))
+            booked_car = Car.query.filter_by(name=name).first()
+            booked_car.status = "Unavailable"
             mysql.session.commit()
     return redirect(url_for('customer_home'))
 
@@ -144,7 +162,8 @@ def customer_history():
 
 @app.route('/admin/home')
 def admin_home():
-    return render_template('admin/home.html')
+    email = session['email']
+    return render_template('admin/home.html',email=email)
 
 
 @app.route('/admin/user', methods=['GET', 'POST'])
@@ -192,12 +211,14 @@ def admin_history():
 
 @app.route('/engineer/home')
 def engineer_home():
-    return render_template('engineer/home.html')
+    email = session['email']
+    return render_template('engineer/home.html',email=email)
 
 
 @app.route('/manager/home')
 def manager_home():
-    return render_template('manager/home.html')
+    email = session['email']
+    return render_template('manager/home.html',email=email)
 
 
 @app.route('/manager/customer')

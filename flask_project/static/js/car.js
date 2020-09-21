@@ -77,8 +77,9 @@ $(document).ready(function ($) {
   });
 
   $(document).on("click", "#submit_button", function (event) {
+    car_name = $('#car_name').val();
     report_message = $("#report_area").val();
-    if (report_message != "") alert(report_message);
+    if (report_message != "") alert(car_name + ': ' +report_message);
   });
 
   $(document).on("click", ".btn_add", function (event) {

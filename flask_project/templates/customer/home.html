@@ -11,22 +11,26 @@
 {% endblock %} {% block body %}
 
 <div class="grid-container">
-    <header class="header">
-      <span style="font-size: 30px; cursor: pointer" onclick="openNav()"
+  <header class="header">
+    <span style="font-size: 30px; cursor: pointer" onclick="openNav()"
       >&#9776; open</span
-      >
-        <!-- <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
+    >
+    <!-- <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
         <a href="{{ url_for('logout') }}"
         ><i class="fas fa-sign-out-alt"></i>Logout</a
         > -->
-    </header>
-    <main class="main">
-        <div class="demo">
-            <div class="content">
-                <div id="large-header" class="large-header">
-                    <canvas id="demo-canvas"></canvas>
-                    <h1 class="main-title">
-            <span>Welcome back Customer</span><br />{{email}}
+  </header>
+  <main class="main">
+    <div class="demo">
+      <div class="content">
+        <div id="large-header" class="large-header">
+          <canvas id="demo-canvas"></canvas>
+          <h1 class="main-title">
+            <span>Welcome back Customer</span><br />{{email}}<br />
+            {% if msg != "" %}
+            <div style="color: red; font-size: 30px; margin: 10px"><span>{{msg}}</span></div>
+            <a href="{{url_for('customer_cancel')}}" class="btn btn-primary btn-lg">Cancel Booking</a>
+            {% endif %}
           </h1>
         </div>
       </div>
@@ -50,12 +54,12 @@
 </div>
 
 <div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="" style="color: white">Home</a>
-    <a href="{{url_for('customer_car')}}">View Cars</a>
-    <a href="{{url_for('customer_history')}}">View History</a>
-    <a href="{{url_for('logout')}}">Logout</a>
-    <!-- <a href="#">Contact</a> -->
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <a href="" style="color: white">Home</a>
+  <a href="{{url_for('customer_car')}}">View Cars</a>
+  <a href="{{url_for('customer_history')}}">View History</a>
+  <a href="{{url_for('logout')}}">Logout</a>
+  <!-- <a href="#">Contact</a> -->
 </div>
 
 <script>
@@ -70,4 +74,3 @@
   }
 </script>
 {% endblock %}
-

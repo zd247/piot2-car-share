@@ -1,5 +1,4 @@
-{% extends 'base.html' %} 
-{% block head %}
+{% extends 'base.html' %} {% block head %}
 <link
   rel="stylesheet"
   href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -25,34 +24,72 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='js/car.js') }}"></script>
 <script type="text/javascript">
-  var car_header = [
-  "Name",
-  "Make",
-  "Body",
-  "Colour",
-  "Seats",
-  "Location",
-  "Cost per hour",
-  "Manufacture date",
-  "Calendar ID",
-]; //TODO change data from here
-var car_key = [
-  "name",
-  "make",
-  "body",
-  "colour",
-  "seats",
-  "location",
-  "cost_per_hour",
-  "manu_date",
-  "calendar_id",
-];
-    var car_data = {{car_list|tojson|safe}};
+    var car_header = [
+    "Name",
+    "Make",
+    "Body",
+    "Colour",
+    "Seats",
+    "Location",
+    "Cost per hour",
+    "Manufacture date",
+    "Calendar ID",
+  ]; //TODO change data from here
+  var car_key = [
+    "name",
+    "make",
+    "body",
+    "colour",
+    "seats",
+    "location",
+    "cost_per_hour",
+    "manu_date",
+    "calendar_id",
+  ];
+      var car_data = {{car_list|tojson|safe}};
 </script>
 <title>Car Data Page</title>
-{% endblock %} 
+{% endblock %} {% block body %}
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Report Car Issue</h4>
+        <button type="button" class="close" data-dismiss="modal">
+          &times;
+        </button>
+      </div>
 
-{% block body %}
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="container">
+          <div class="row">
+            <textarea class="form-control" id="car_name">Car Name</textarea>
+            <label class="m-3">Issues</label>
+            <!-- <input type="email" class="form-control" id="email" placeholder="email"> -->
+            <textarea class="form-control" rows="6" id="report_area"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          data-dismiss="modal"
+          id="submit_button"
+        >
+          Submit
+        </button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="grid-container">
   <header class="header">
     <span style="font-size: 30px; cursor: pointer" onclick="openNav()"
@@ -62,10 +99,7 @@ var car_key = [
   <main class="main">
     <div class="container text-center">
       <h1>Car Data</h1>
-      <h2>
-        Please make sure there is no duplicate id or email address. Refresh the
-        page after saving everything to take effect
-      </h2>
+      <h2>Please make sure there is no duplicate car name and empty cell.</h2>
 
       <i class="fas fa-search m-3"> Search </i
       ><input id="myInput" type="text" placeholder="Search.." />
@@ -78,13 +112,15 @@ var car_key = [
           <span class="btn_save_all">
             <a href="#" class="btn btn-primary btn-lg m-3" row_id="">
               Save All Changes
-            </a></span>
+            </a></span
+          >
         </div>
         <div class="col-sm-6 text-center" id="add_button">
           <span class="btn_add">
             <a href="#" class="btn btn-primary btn-lg m-3" row_id="">
               Add A Record
-            </a></span>
+            </a></span
+          >
         </div>
       </div>
     </div>
@@ -105,14 +141,14 @@ var car_key = [
 </div>
 
 <script>
-function openNav() {
-  document.getElementById("mySidenav").style.width = "250px";
-  document.body.style.backgroundColor = "rgb(0,0,0,0.4)";
-}
+  function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+    document.body.style.backgroundColor = "rgb(0,0,0,0.4)";
+  }
 
-function closeNav() {
-  document.getElementById("mySidenav").style.width = "0";
-  document.body.style.backgroundColor = "white";
-}
+  function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+    document.body.style.backgroundColor = "white";
+  }
 </script>
 {% endblock body %}

@@ -1,0 +1,46 @@
+Intro the Car Application Website
+=================================
+
+This section will show you how to register and login to the Car Application Website.
+
+.. figure:: /images/home.png
+    :align: center
+
+    *The Application Home Page*
+
+.. _register:
+
+Register
+--------
+
+1. Go to the website.
+2. Click **Register** in the top right of the Home Page.
+
+.. figure:: /images/register.png
+    :align: center
+
+    *The Register Page*
+
+3. Enter your information.
+4. Choose your role:
+    * Customer: can book a car, cancel current booking, view the booking history, search for a car or history.
+    * Admin: can view, search, add, remove and edit customers and cars, view all customers' booking history, report car problems to engineers.
+    * Manager: can view the graphs contain the statistic of the customers and cars.
+    * Engineer: can view the current locations of the reported cars, view the whole maps.
+5. Click **Register**
+
+Login
+-----
+
+1. Go to the website.
+2. Click **Login** in the top right of the Home Page.
+
+.. figure:: /images/login.png
+    :align: center
+
+    *The Register Page*
+
+3. Enter your information or login using Google or Facebook account.
+4. If you don't have an account you can click :ref:`Does not have an account? Register now! <register>` to register.
+5. Click Login.
+   
