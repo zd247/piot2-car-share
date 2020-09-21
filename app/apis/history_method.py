@@ -9,6 +9,19 @@ from app import db
 
 history_blueprint = Blueprint('history', __name__, url_prefix="/api/v1/history")
 
+def new_car_dict(self, car):
+    return {
+    'name': car.name,
+    'make': car.make,
+    'body': car.body,
+    'colour': car.colour,
+    'seats': car.seats,
+    'location': car.location,
+    'cost_per_hour': car.cost_per_hour,
+    'manu_date': car.manu_date,
+    'calendar_id': car.calendar_id
+}
+
 class RestfulAPI (MethodView):
     @jwt_required
     def get(self, event_id = None):
@@ -17,10 +30,10 @@ class RestfulAPI (MethodView):
             # expose the list of cars
             if (event_id is None):
                 histories = History.query.all()
-                cars_dict = {}
+                histories_dict = {}
 
-                for car in cars:
-                    new_car = new_car_dict(self, car)
+                for history in histories:
+                    new_history = new_car_dict(self, car)
                     cars_dict[new_car['name']] = new_car
                             
                 responseObject = {

@@ -89,6 +89,7 @@ from app.apis.cars_method import cars_blueprint
 from app.apis.users_method import users_blueprint
 from app.apis.bookings_method import bookings_blueprint
 from app.apis.emails_method import emails_blueprint
+from app.apis.history_method import history_blueprint
 from app.models.car import Car
 from app.models.user import User
 from sqlalchemy import exc, extract
@@ -99,6 +100,7 @@ app.register_blueprint(cars_blueprint)
 app.register_blueprint(users_blueprint)
 app.register_blueprint(bookings_blueprint)
 app.register_blueprint(emails_blueprint)
+app.register_blueprint(history_blueprint)
 
 
 #===================[Routing]========================
@@ -186,11 +188,6 @@ def customer_history():
     return render_template('customer/history.html', history_list=history_list)
 
 #================[Admin]=================
-
-class UserSchema(ma.Schema):
-    class Meta:
-        fields = ('email', 'email_confirmed_at', 'password',
-            'registered_on', 'first_name', 'last_name', 'active', 'role')
 
 @app.route('/admin/home')
 def admin_home():
