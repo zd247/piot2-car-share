@@ -13,8 +13,6 @@ class BaseConfig:
     BCRYPT_LOG_ROUNDS = 13
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    
-    
     # Flask-Mail SMTP server settings
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
@@ -55,7 +53,7 @@ class DevelopmentConfig(BaseConfig):
     """Development configuration."""
     DEBUG = True
     BCRYPT_LOG_ROUNDS = 4
-    SQLALCHEMY_DATABASE_URI = postgres_local_base + database_name
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@/piot2?unix_socket=/cloudsql/piot2790:mysequel'
 
 
 class TestingConfig(BaseConfig):
@@ -71,4 +69,4 @@ class ProductionConfig(BaseConfig):
     """Production configuration."""
     SECRET_KEY = 'my_precious'
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql:///example'
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@/piot2?unix_socket=/cloudsql/piot2790:mysequel'
