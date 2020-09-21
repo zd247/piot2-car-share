@@ -12,7 +12,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-o", "--output", type=str, default="barcodes.csv",
     help="path to output CSV file containing barcodes")
 args = vars(ap.parse_args())
-
+data = ""
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
@@ -25,6 +25,7 @@ csv = open(args["output"], "w")
 found = set()
 
 # loop over the frames from the video stream
+
 while True:
     # grab the frame from the threaded video stream and resize it to
     # have a maximum width of 400 pixels
@@ -44,6 +45,7 @@ while True:
         # on our output image we need to convert it to a string first
         barcodeData = barcode.data.decode("utf-8")
         barcodeType = barcode.type
+        data = barcodeData
  
         # draw the barcode data and barcode type on the image
         text = "{} ({})".format(barcodeData, barcodeType)
@@ -60,14 +62,18 @@ while True:
 
             # show the output frame
     cv2.imshow("Barcode Scanner", frame)
-    key = cv2.waitKey(1) & 0xFF
+    key = cv2.waitKey(10) & 0xff
  
     # if the `q` key was pressed, break from the loop
-    if key == ord("q"):
+    if key == 27:
         break
+    if "engineer" in data:
+        print("Welcome " + str(data))
+        break
+
  
 # close the output CSV file do a bit of cleanup
-print("[INFO] cleaning up...")
+
 csv.close()
 cv2.destroyAllWindows()
 vs.stop()

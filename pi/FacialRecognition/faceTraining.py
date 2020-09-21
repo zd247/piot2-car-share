@@ -1,8 +1,8 @@
 ''''
 Training Multiple Faces stored on a DataBase:
-	==> Each face should have a unique numeric integer ID as 1, 2, 3, etc                       
-	==> LBPH computed model will be saved on trainer/ directory. (if it does not exist, pls create one)
-	==> for using PIL, install pillow library with "pip install pillow"
+    ==> Each face should have a unique numeric integer ID as 1, 2, 3, etc                       
+    ==> LBPH computed model will be saved on trainer/ directory. (if it does not exist, pls create one)
+    ==> for using PIL, install pillow library with "pip install pillow"
 
 Based on original code by Anirban Kar: https://github.com/thecodacus/Face-Recognition    
 
@@ -41,7 +41,6 @@ def getImagesAndLabels(path):
             ids.append(id)
 
     return faceSamples,ids
-
 print ("\n [INFO] Training faces. It will take a few seconds. Wait ...")
 faces,ids = getImagesAndLabels(path)
 recognizer.train(faces, np.array(ids))

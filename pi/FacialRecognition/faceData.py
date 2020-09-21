@@ -1,7 +1,7 @@
 ''''
 Capture multiple Faces from multiple users to be stored on a DataBase (dataset directory)
-	==> Faces will be stored on a directory: dataset/ (if does not exist, pls create one)
-	==> Each face will have a unique numeric integer ID as 1, 2, 3, etc                       
+    ==> Faces will be stored on a directory: dataset/ (if does not exist, pls create one)
+    ==> Each face will have a unique numeric integer ID as 1, 2, 3, etc                       
 
 Based on original code by Anirban Kar: https://github.com/thecodacus/Face-Recognition    
 
@@ -16,15 +16,17 @@ cam = cv2.VideoCapture(0)
 cam.set(3, 640) # set video width
 cam.set(4, 480) # set video height
 
+list = os.listdir("/home/pi/Downloads/piot2-car-share/pi/FacialRecognition/dataset")
+number_of_files = len(list)
+face_id = (number_of_files/30)+1
+
 face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 # For each person, enter one numeric face id
-face_id = input('\n enter user id end press <return> ==>  ')
 
 print("\n [INFO] Initializing face capture. Look the camera and wait ...")
 # Initialize individual sampling face count
 count = 0
-
 while(True):
 
     ret, img = cam.read()
