@@ -23,15 +23,20 @@ class User(db.Model):
     # roles = db.relationship('Role', secondary='user_roles')
     role  = db.Column(db.String(30), nullable=False, server_default='customer')
 
-    def __init__(self, email, password, first_name, last_name, role):
+    def __init__(self, email, first_name, last_name, role, password="", email_confirmed_at=datetime.now(), registered_on=datetime.now(), active=True):
         self.email = email
-        self.password = bcrypt.generate_password_hash(
-            password, app.config.get('BCRYPT_LOG_ROUNDS')
-        ).decode()
+        if password == "":
+            self.password = bcrypt.generate_password_hash(
+                password, app.config.get('BCRYPT_LOG_ROUNDS')
+            ).decode()
+        else:
+            self.password = password
         self.first_name = first_name
         self.last_name = last_name
         self.role = role
-        self.registered_on = datetime.datetime.now()
+        self.registered_on = registered_on
+        self.active = active
+        self.email_confirmed_at = email_confirmed_at
 
 
 
