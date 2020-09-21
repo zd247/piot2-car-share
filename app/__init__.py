@@ -12,6 +12,7 @@ from flask_restplus import Api
 
 from app.cloud import * 
 from app._google import create_service
+from flask_marshmallow import Marshmallow
 
 import requests
 import json
@@ -22,6 +23,7 @@ import time
 
 # init app and cors
 app = Flask(__name__, instance_relative_config=True)
+ma = Marshmallow(app)
 
 # security
 CORS(app)
@@ -98,6 +100,7 @@ app.register_blueprint(users_blueprint)
 app.register_blueprint(bookings_blueprint)
 app.register_blueprint(emails_blueprint)
 
+
 #===================[Routing]========================
 
 
@@ -126,8 +129,8 @@ def login_redirect():
     role = request.cookies.get('role')
     if (role == 'customer'):
         return redirect(url_for('customer_home'))
-    elif role == 'manager':
-        return "ok"
+    elif role == 'admin':
+        return redirect(url_for('admin_home'))
     return url_for('login')
 
 
@@ -167,6 +170,11 @@ def customer_car():
 
 @app.route('/customer/booking/', methods=['GET', 'POST'])
 def customer_booking():   
+    # if request.method == 'POST':
+    #     try:
+            
+    #     except Exception as e:
+    #         print (e)
     return render_template('customer/booking.html')
 
 from app.models.history import History
@@ -177,44 +185,26 @@ def customer_history():
     history_list = History.query.filter_by(email=customer_email).all()
     return render_template('customer/history.html', history_list=history_list)
 
+#================[Admin]=================
 
-# @app.route('/admin/home')
-# def admin_home():
-#     return render_template('admin/home.html')
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('email', 'email_confirmed_at', 'password',
+            'registered_on', 'first_name', 'last_name', 'active', 'role')
 
-# @app.route('/admin/user', methods=['GET', 'POST'])
-# def admin_user():
-#     if request.method == 'POST':
-#         try:
-#             new_list = request.form['user_data']
-#             User.query.delete()
-#             for user in json.loads(new_list):
-#                 db.session.add(User(
-#                     user['email'], user['password'], user['first_name'], user['last_name'], user['role']))
-#         except exc.SQLAlchemyError as e:
-#             db.session.rollback()
-#     db.session.commit()
-#     list = User.query.all()
-#     user_schema = UserSchema(many=True)
-#     user_list = user_schema.dump(list)
-#     return render_template('admin/user.html', user_list=user_list)
+@app.route('/admin/home')
+def admin_home():
+    return render_template('admin/home.html')
 
-# @app.route('/admin/car', methods=['GET', 'POST'])
-# def admin_car():
-#     if request.method == 'POST':
-#         try:
-#             new_list = request.form['car_data']
-#             Car.query.delete()
-#             for car in json.loads(new_list):
-#                 db.session.add(Car(car['name'], car['make'], car['body'], car['colour'],
-#                                       car['seats'], car['location'], car['cost_per_hour'], car['manu_date']))
-#         except exc.SQLAlchemyError as e:
-#             db.session.rollback()
-#     db.session.commit()
-#     list = Car.query.all()
-#     car_schema = CarSchema(many=True)
-#     car_list = car_schema.dump(list)
-#     return render_template('admin/car.html', car_list=car_list)
+@app.route('/admin/user', methods=['GET', 'POST'])
+def admin_user():
+    user_list = User.query.all()
+    return render_template('admin/user.html', user_list=user_list)
+
+@app.route('/admin/car', methods=['GET', 'POST'])
+def admin_car():
+    car_list = Car.query.all()
+    return render_template('admin/car.html', car_list=car_list)
 
 # @app.route('/engineer/home')
 # def engineer_home():
