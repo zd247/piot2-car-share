@@ -12,7 +12,7 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/sidebar.css') }}"
 />
-<title>Booking History Page</title>
+<title>History Data Page</title>
 <!--Font Awesome (added because you use icons in your prepend/append)-->
 <link
   rel="stylesheet"
@@ -29,12 +29,16 @@
   </header>
   <main class="main">
     <div class="container text-center">
-        <h2 id="myHeader"><span>Booking History</span></h2>
-        <div class="m-3"><i class="fas fa-search">Search for any keyword:</i><input type="text" id="myInput" placeholder="Search for keyword" /></div>
+      <h2 id="myHeader"><span>Booking history of all customers</span></h2>
+      <div class="m-3">
+        <i class="fas fa-search">Search for any keyword:</i
+        ><input type="text" id="myInput" placeholder="Search for keyword" />
       </div>
+    </div>
     <table id="myTable" class="table table-hover table-bordered m-auto">
       <thead>
-        <tr style="background-color: bisque;">
+        <tr style="background-color: bisque">
+          <th>Customer Email</th>
           <th>Car Name</th>
           <th>Rent Date</th>
           <th>Return Date</th>
@@ -44,6 +48,7 @@
       <tbody>
         {% for history_info in history_list %}
         <tr>
+          <td>{{history_info.email}}</td>
           <td>{{history_info.car}}</td>
           <td>{{history_info.rent_date}}</td>
           <td>{{history_info.return_date}}</td>
@@ -53,10 +58,11 @@
       </tbody>
       <tfoot>
         <tr>
-            <th>Car Name</th>
-            <th>Rent Date</th>
-            <th>Return Date</th>
-            <th>Verify Date</th>
+          <th>Customer Email</th>
+          <th>Car Name</th>
+          <th>Rent Date</th>
+          <th>Return Date</th>
+          <th>Verify Date</th>
         </tr>
       </tfoot>
     </table>
@@ -77,9 +83,10 @@
 
 <div id="mySidenav" class="sidenav">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-  <a href="{{url_for('customer_home')}}">Home</a>
-  <a href="{{url_for('customer_car')}}">View Cars</a>
-  <a href="" style="color: white">View History</a>
+  <a href="{{url_for('admin_home')}}">Home</a>
+  <a href="{{url_for('admin_user')}}">User List</a>
+  <a href="{{url_for('admin_car')}}">Car List</a>
+  <a href="" style="color: white">Booking History</a>
   <a href="{{url_for('logout')}}">Logout</a>
   <!-- <a href="#">Contact</a> -->
 </div>

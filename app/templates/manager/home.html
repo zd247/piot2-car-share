@@ -6,7 +6,7 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/sidebar.css') }}"
 />
-<title>Home Page</title>
+<title>Manager Home Page</title>
 {% endblock %}
 
 {% block body %}
@@ -36,9 +36,9 @@
 
 <div id="mySidenav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#">Home</a>
+    <a href="" style="color: white;">Home</a>
     <a href="{{url_for('manager_customer')}}">New customer statistic</a>
-    <a href="#">Booking statistic</a>
+    <a href="{{url_for('manager_customer')}}">Booking statistic</a>
     <a href="{{url_for('logout')}}">Logout</a>
 </div>
 

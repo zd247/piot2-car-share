@@ -5,6 +5,7 @@ from flask import Flask, request, render_template_string, render_template, jsoni
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy import Column, Integer, String, Float, CheckConstraint, exc, DateTime, Boolean, extract
 
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
@@ -84,6 +85,7 @@ mail_server.login("zduy2407@gmail.com", "Game1468")
 
 
 # register controller blueprints
+
 from app.apis.auth_method import auth_blueprint
 from app.apis.cars_method import cars_blueprint
 from app.apis.users_method import users_blueprint
@@ -92,7 +94,8 @@ from app.apis.emails_method import emails_blueprint
 from app.apis.history_method import history_blueprint
 from app.models.car import Car
 from app.models.user import User
-from sqlalchemy import exc, extract
+from app.models.history import History
+from sqlalchemy import Column, Integer, String, Float, CheckConstraint, exc, DateTime, Boolean, extract
 from sqlalchemy.sql.functions import count, Cast, func
 
 app.register_blueprint(auth_blueprint)
@@ -166,20 +169,11 @@ def customer_home():
 @app.route('/customer/car')
 def customer_car():
     car_list = Car.query.all()
-    first_name = request.cookies.get('first_name')
-    last_name = request.cookies.get('last_name')
-    return render_template('customer/car.html', car_list=car_list, name= first_name + ' ' + last_name)
+    return render_template('customer/car.html', car_list=car_list)
 
 @app.route('/customer/booking/', methods=['GET', 'POST'])
 def customer_booking():   
-    # if request.method == 'POST':
-    #     try:
-            
-    #     except Exception as e:
-    #         print (e)
     return render_template('customer/booking.html')
-
-from app.models.history import History
 
 @app.route('/customer/history')
 def customer_history():
@@ -191,32 +185,84 @@ def customer_history():
 
 @app.route('/admin/home')
 def admin_home():
-    return render_template('admin/home.html')
+    email = request.cookie.get('email')
+    return render_template('admin/home.html', email=email)
+
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('email', 'email_confirmed_at', 'password',
+                  'registered_on', 'first_name', 'last_name', 'active', 'role')
+
+class CarSchema(ma.Schema):
+    class Meta:
+        fields = ('name', 'make', 'body', 'colour', 'seats',
+                  'location', 'cost_per_hour', 'manu_date', 'calendar_id', 'status')
 
 @app.route('/admin/user', methods=['GET', 'POST'])
 def admin_user():
+    if request.method == 'POST':
+        try:
+            new_list = request.form['user_data']
+            User.query.delete()
+            for user in json.loads(new_list):
+                db.session.add(User(
+                    user['email'], user['password'], user['first_name'], user['last_name'], user['role'], user['email_confirmed_at'], user['registered_on'], user['active']))
+        except exc.SQLAlchemyError as e:
+            db.session.rollback()
+    db.session.commit()
     user_list = User.query.all()
+    user_schema = UserSchema(many=True)
+    user_list = user_schema.dump(list)
     return render_template('admin/user.html', user_list=user_list)
 
 @app.route('/admin/car', methods=['GET', 'POST'])
 def admin_car():
+    if request.method == 'POST':
+        try:
+            new_list = request.form['car_data']
+            print(new_list)
+            Car.query.delete()
+            for car in json.loads(new_list):
+                db.session.add(Car(car['name'], car['make'], car['body'], car['colour'],
+                                      car['seats'], car['location'], car['cost_per_hour'], car['manu_date'].replace('T', ' '), car['calendar_id'], car['status']))
+        except exc.SQLAlchemyError as e:
+            db.session.rollback()
+    db.session.commit()
     car_list = Car.query.all()
+    car_schema = CarSchema(many=True)
+    car_list = car_schema.dump(list)
     return render_template('admin/car.html', car_list=car_list)
 
-# @app.route('/engineer/home')
-# def engineer_home():
-#     return render_template('engineer/home.html')
+#================[Engineer]=================
 
-# @app.route('/manager/home')
-# def manager_home():
-#     return render_template('manager/home.html')
+@app.route('/engineer/home')
+def engineer_home():
+    email = request.cookie.get('email')
+    return render_template('engineer/home.html',email=email)
 
-# @app.route('/manager/customer')
-# def manager_customer():
-#     new_customer_in_6_month = db.session.query(Cast(extract('month', User.email_confirmed_at), String), func.count(User.email)).group_by(extract('month', User.email_confirmed_at)).all()
-#     car_by_make = db.session.query(Car.make, func.count(Car.name)).group_by(Car.make).all()
-#     return render_template('manager/customer.html', new_customer_in_6_month=json.dumps(new_customer_in_6_month)
-#                                         ,   car_by_make=json.dumps(car_by_make))
+#================[Manager]=================
+
+@app.route('/manager/home')
+def manager_home():
+    email = request.cookie.get('email')
+    return render_template('manager/home.html',email=email)
+
+@app.route('/manager/customer')
+def manager_customer():
+    new_customer_in_6_month = db.session.query(Cast(extract('month', User.email_confirmed_at), String), func.count(
+        User.email)).filter_by(role='customer').group_by(extract('month', User.email_confirmed_at)).all()
+    customer_booking_in_6_month = db.session.query(Cast(extract('month', History.verify_date), String), func.count(
+        History.email)).group_by(extract('month', History.verify_date)).all()
+    return render_template('manager/customer.html', new_customer_in_6_month=json.dumps(new_customer_in_6_month),
+                           customer_booking_in_6_month=json.dumps(customer_booking_in_6_month))
+
+@app.route('/manager/car')
+def manager_car():
+    car_by_make = db.session.query(
+        Car.make, func.count(Car.name)).group_by(Car.make).all()
+    car_make_booked = db.session.query(Car.make, func.count(
+        Car.make)).join(History, Car.name == History.car).group_by(Car.make).all()
+    return render_template('manager/car.html', car_by_make=json.dumps(car_by_make), car_make_booked=json.dumps(car_make_booked))
 
 
 
