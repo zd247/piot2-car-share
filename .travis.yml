@@ -14,7 +14,6 @@ install:
   - pip install Flask-User
   - pip install Flask-Testing
   - pip install flask-jwt-extended
-  - pip install flask-marshmallow
 # command to run tests
 script: python3 fake_test.py || python fake_test.py
 
