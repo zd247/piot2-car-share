@@ -11,7 +11,9 @@
   integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
   crossorigin="anonymous"
 />
-{% endblock %} {% block body %}
+{% endblock %} 
+
+{% block body %}
 <body>
   <div id="booking" class="section">
     <!-- <div class="section-left"> -->
@@ -21,17 +23,22 @@
           <h1>Book a car</h1>
         </div>
         <form method="POST">
-          <h2 style="color: white;">Car Name </h2>
-          <h2 style="color: white;">Email </h2>
+          <div class="col-sm">
+            <div class="form-label-group">
+              <label style="color: white;" for="car_name">Car name</label>
+              <input  id="car_name" name="car_name" class="form-control" required>
+            </div>
+          </div>
+          <br>
           <div class="row">
             <div class="col-sm">
               <div class="form-group">
                 <span class="form-label">Rent Date</span>
                 <input
-                  id="rent_date"
+                  id="start_time"
                   name="rent_date"
                   class="form-control"
-                  type="date"
+                  type="datetime-local"
                   required
                 />
               </div>
@@ -40,10 +47,10 @@
               <div class="form-group">
                 <span class="form-label">Return Date</span>
                 <input
-                  id="return_date"
+                  id="end_time"
                   name="return_date"
                   class="form-control"
-                  type="date"
+                  type="datetime-local"
                   required
                 />
               </div>
@@ -52,12 +59,12 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-btn">
-                <button class="submit-btn">Book Now</button>
+                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" onclick="book_a_car()">Book  </button>
               </div>
             </div>
             <div class="col-sm-6">
-              <div class="form-btn">
-                <button class="submit-btn">Cancel</button>
+              <div class="form-btn"></div>
+                <a href="{{ url_for('customer_car') }}">Cancel</a>
               </div>
             </div>
           </div>
@@ -66,4 +73,63 @@
     </div>
   </div>
 </body>
+
+<script>
+  const URL = 'http://localhost:5000'
+
+  const access_token = document.cookie
+                        .split('; ')
+                        .find(row => row.startsWith('access_token'))
+                        .split('=')[1];
+  const customer_email = document.cookie
+                          .split('; ')
+                          .find(row => row.startsWith('email'))
+                          .split('=')[1];
+
+  function book_a_car() {
+    authorization = "Bearer " + access_token
+
+    car_name = document.getElementById('car_name')
+    start_time = document.getElementById('start_time')
+    end_time = document.getElementById('end_time')
+    
+    post_data = {
+        start_time: start_time.value + ":01Z",
+        end_time: end_time.value + ":01Z"
+    }
+
+    fetch(`${window.origin}/api/v1/bookings/` + car_name.value + `/`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify(post_data),
+      cache: "no-cache",
+      headers: new Headers({
+          "content-type": "application/json",
+          "authorization": authorization
+        })
+      })
+      .then(function (response) {
+          response.json().then(function (data) {
+            let statusData = JSON.stringify(data.status).replace(/^"(.*)"$/, '$1');
+            alert (statusData)
+            if (statusData === 'created') {
+              window.location.replace(URL + "/customer/car");
+            }else {
+              alert (JSON.stringify(data))
+            }
+    
+          });
+      })
+      .catch(function (error) {
+          alert("Fetch error: " + error);
+      });
+  }
+
+  function cancel_booking() {
+    window.location.replace(URL + "/customer/car");
+  }
+</script>
+
 {% endblock %}
+
+

@@ -19,23 +19,9 @@
         >
   </header>
   <main class="main">
-    <h1><span>Welcome back Customer</span><br />Doan Luong Hoang</h1>
+    <h1><span>Welcome back Customer</span></h1> {{name}}
+    <br>
     <div class="grid-container-sm" id="myContainer">
-      <div class="row">
-        <img src="static/image/nothing.jpg" class="img-fluid" id="myImage" />
-      </div>
-      <div class="row">
-        <h2 id="myHeader"><span>Please choose a car to book</span></h2>
-      </div>
-      <div class="row">
-        <input
-          type="text"
-          id="myInput"
-          onkeyup="search(1)"
-          placeholder="Search for car names.."
-          class="fas fa-search"
-        />
-      </div>
       <div class="row">
         <div class="container-sm" style="overflow: auto; height: 25vh">
           <table id="myTable" class="table table-hover table-bordered">
@@ -48,7 +34,6 @@
               <th>Location</th>
               <th>Cost</th>
               <th>Manu Date</th>
-              <th>Book</th>
             </tr>
             {% for car_info in car_list %}
             <tr id="{{ car_info.name }}" onmouseover="changeImage(this.id)">
@@ -60,17 +45,36 @@
               <td>{{car_info.location}}</td>
               <td>{{car_info.cost_per_hour}}</td>
               <td>{{car_info.manu_date}}</td>
-              <td>
-                <button class="btn btn-outline-dark" type="submit" id="select_book_car">Select</button>
-                
-                
-              </td>
             </tr>
             {% endfor %}
+
+            <a href="{{url_for('customer_booking')}}">BOOK A CAR HERE! !!!!!</a>
           </table>
         </div>
       </div>
     </div>
+
+    <div id="mySidenav" class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <a href="{{url_for('customer_home')}}">Home</a>
+      <a href="{{url_for('customer_car')}}">View Cars</a>
+      <a href="#">View History</a>
+      <a href="{{url_for('logout')}}">Logout</a>
+      <!-- <a href="#">Contact</a> -->
+    </div>
+
+    <script>
+      function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+        document.body.style.backgroundColor = "rgb(0,0,0,0.4)";
+      }
+
+      function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+        document.body.style.backgroundColor = "white";
+      }
+
+    </script>
 
     <script
       type="text/javascript"
@@ -88,64 +92,12 @@
       type="text/javascript"
       src="{{ url_for('static', filename='js/sort.js') }}"
     ></script>
+    
   </main>
   <footer class="footer">
     <a>Welcome to Car World</a>
   </footer>
 </div>
 
-<div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="{{url_for('customer_home')}}">Home</a>
-    <a href="#">View Cars</a>
-    <a href="#">View History</a>
-    <a href="{{url_for('logout')}}">Logout</a>
-    <!-- <a href="#">Contact</a> -->
-</div>
 
-<script>
-  const acessToken = document.cookie
-                      .split('; ')
-                      .find(row => row.startsWith('access_token'))
-                      .split('=')[1];
- 
-  function book_a_car() {
-    authorization = "Bearer " + accessToken
-
-    alert (authorization)
-  
-    // TODO: fix this
-    fetch(`${window.origin}/api/v1/bookings/Honda12`, {
-      method: "POST",
-      credentials: "include",
-      body: JSON.stringify(post_data),
-      cache: "no-cache",
-      headers: new Headers({
-          "content-type": "application/json",
-          "Authorization": authorization
-        })
-      })
-      .then(function (response) {
-          response.json().then(function (data) {
-            alert("Car book with data: " + data);
-          });
-      })
-      .catch(function (error) {
-          alert("Fetch error: " + error);
-      });
-  }
-
-  document.getElementById("select_book_car").addEventListener("click", book_a_car);
-
-  function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-    document.body.style.backgroundColor = "rgb(0,0,0,0.4)";
-  }
-
-  function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    document.body.style.backgroundColor = "white";
-  }
-
-</script>
 {% endblock %}

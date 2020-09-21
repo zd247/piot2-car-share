@@ -1,0 +1,70 @@
+{% extends 'base.html' %} {% block head %}
+<link
+rel="stylesheet"
+href="{{ url_for('static', filename='css/booking.css') }}"
+/>
+<title>Booking Page</title>
+<!--Font Awesome (added because you use icons in your prepend/append)-->
+<link
+rel="stylesheet"
+href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
+crossorigin="anonymous"
+/>
+{% endblock %} {% block body %}
+<body>
+<div id="booking" class="section">
+    <!-- <div class="section-left"> -->
+    <div class="container">
+    <div class="booking-form">
+        <div class="form-header">
+        <h1>Book a car</h1>
+        </div>
+        <form method="POST">
+        <h2 style="color: white;">Car Name {{ car_name }}</h2>
+        <h2 style="color: white;">Email {{ email }}</h2>
+        <div class="row">
+            <div class="col-sm">
+            <div class="form-group">
+                <span class="form-label">Rent Date</span>
+                <input
+                id="rent_date"
+                name="rent_date"
+                class="form-control"
+                type="date"
+                required
+                />
+            </div>
+            </div>
+            <div class="col-sm">
+            <div class="form-group">
+                <span class="form-label">Return Date</span>
+                <input
+                id="return_date"
+                name="return_date"
+                class="form-control"
+                type="date"
+                required
+                />
+            </div>
+            </div>
+        </div>
+        <div class="msg" style="color: red">{{ msg }}</div>
+        <div class="row">
+            <div class="col-sm-6">
+            <div class="form-btn">
+                <button class="submit-btn">Book Now</button>
+            </div>
+            </div>
+            <div class="col-sm-6">
+            <div class="form-btn">
+                <button class="submit-btn">Cancel</button>
+            </div>
+            </div>
+        </div>
+        </form>
+    </div>
+    </div>
+</div>
+</body>
+{% endblock %}

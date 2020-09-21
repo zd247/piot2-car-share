@@ -39,7 +39,7 @@
   </div>
 
   <script>
-    let URL = 'http://localhost:5000'
+    const URL = 'http://localhost:5000'
 
     function signIn() {
       let email = document.getElementById('email')
@@ -62,7 +62,13 @@
         .then(function (response) {
             
             response.json().then(function (data) {
-              window.location.replace(URL + "/login_redirect");
+              let statusData = JSON.stringify(data.status).replace(/^"(.*)"$/, '$1');
+              if (statusData === 'success') {
+                window.location.replace(URL + "/login_redirect");
+              }else {
+                alert (JSON.stringify(data))
+              }
+  
             });
         })
         .catch(function (error) {

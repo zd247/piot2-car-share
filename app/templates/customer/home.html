@@ -26,7 +26,7 @@
                 <div id="large-header" class="large-header">
                     <canvas id="demo-canvas"></canvas>
                     <h1 class="main-title">
-            <span>Welcome back Customer</span><br />{{email}}
+            <span>Welcome back Customer</span><br />
             <p id = "user_email"></p>
           </h1>
         </div>
@@ -60,11 +60,13 @@
 </div>
 
 <script>
-  const cookieValue = document.cookie
+  const emailCookieValue = document.cookie
                       .split('; ')
                       .find(row => row.startsWith('email'))
                       .split('=')[1];
-  document.getElementById("user_email").innerHTML = cookieValue
+  let emailData  = emailCookieValue.replace(/^"(.*)"$/, '$1');
+                
+  document.getElementById("user_email").innerHTML = emailData
 
   function openNav() {
     document.getElementById("mySidenav").style.width = "250px";

@@ -63,7 +63,16 @@ class RegisterAPI(MethodView):
                     'role': user.role
                 }
                 
-                return make_response(jsonify(responseObject)), 201
+                response = make_response(jsonify(responseObject))
+                
+                
+                response.set_cookie('role',user.role)
+                response.set_cookie('access_token',access_token, max_age=86400)
+                response.set_cookie('email', str(user.email))
+                response.set_cookie('first_name', str(user.first_name))
+                response.set_cookie('last_name', str(user.last_name))
+                
+                return response, 201
             except Exception as e:
                 responseObject = {
                     'status': 'fail',
@@ -112,8 +121,10 @@ class LoginAPI(MethodView):
                 
                 
                 response.set_cookie('role',user.role)
-                response.set_cookie('acess_token',access_token)
+                response.set_cookie('access_token',access_token, max_age=86400)
                 response.set_cookie('email', str(user.email))
+                response.set_cookie('first_name', str(user.first_name))
+                response.set_cookie('last_name', str(user.last_name))
                 
                 return response, 200
             else:

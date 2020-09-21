@@ -25,15 +25,11 @@
                     <div class="form-label-group">
                       <input type="lname" id="lname" name="lname" class="form-control" placeholder="Last Name" required>
                       <label for="lname">Last Name</label>
+                    </div>
                   </div>
-                  </div>
                 </div>
-                </div>
-                <div class="form-label-group">
-                    <input type="date" id="birth" name="birth" class="form-control" placeholder="mm/dd/yyyy" required>
-                    <label for="birth">Birth</label>
-                </div>
-                 <div class="form-label-group">
+              </div>
+              <div class="form-label-group">
                 <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required autofocus>
                 <label for="email">Email address</label>
               </div>
@@ -43,30 +39,79 @@
               </div>
               <div class="form-check-inline">
                 <label class="form-check-label">
-                  <input type="radio" class="form-check-input" name="role" value="Customer">Customer
+                  <input type="radio" class="form-check-input" name="role" value="Customer" id="customer_radio">Customer
                 </label>
               </div>
               <div class="form-check-inline">
                 <label class="form-check-label">
-                  <input type="radio" class="form-check-input" name="role" value="Admin">Admin
+                  <input type="radio" class="form-check-input" name="role" value="Admin" id = "admin_radio">Admin
                 </label>
               </div>
               <div class="form-check-inline">
                 <label class="form-check-label">
-                  <input type="radio" class="form-check-input" name="role" value="Manager">Manager
+                  <input type="radio" class="form-check-input" name="role" value="Manager" id = "manager_radio">Manager
                 </label>
               </div>
               <div class="form-check-inline">
                 <label class="form-check-label">
-                  <input type="radio" class="form-check-input" name="role" value="Engineer">Engineer
+                  <input type="radio" class="form-check-input" name="role" value="Engineer" id = "engineer_radio">Engineer
                 </label>
               </div>
-              <div class="msg" style="color: red;">{{ msg }}</div>
-              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Register</button>
-            </form>
-          </div>
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" onclick="signUp()">Register</button>
+          </form>
         </div>
       </div>
     </div>
   </div>
+</div>
+
+<script>
+  let URL = 'http://localhost:5000'
+  
+  function signUp() {
+    let email = document.getElementById('email')
+    let password = document.getElementById('password')
+    let first_name = document.getElementById('fname')
+    let last_name = document.getElementById('lname')
+
+    let role = document.querySelector('input[name="role"]:checked').value;
+
+    let post_data = {
+      email: email.value,
+      password: password.value,
+      first_name: first_name.value,
+      last_name: last_name.value,
+      role: role.toLowerCase()
+    }
+
+    fetch(`${window.origin}/api/v1/auth/register`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify(post_data),
+      cache: "no-cache",
+      headers: new Headers({
+          "content-type": "application/json"
+        })
+      })
+      .then(function (response) {
+          response.json().then(function (data) {
+            let statusData = JSON.stringify(data.status).replace(/^"(.*)"$/, '$1');
+            if (statusData === 'success') {
+              window.location.replace(URL + "/login_redirect");
+            }else {
+              alert (JSON.stringify(data))
+            }
+            
+          });
+      })
+      .catch(function (error) {
+          alert("Fetch error: " + error);
+      });
+
+    
+  }
+
+
+</script>
+  
 {% endblock %}

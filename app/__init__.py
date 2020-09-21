@@ -1,7 +1,7 @@
 import os
 import datetime
 
-from flask import Flask, request, render_template_string, render_template, jsonify, make_response, session, redirect, url_for
+from flask import Flask, request, render_template_string, render_template, jsonify, make_response, session, redirect, url_for, Response
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -17,6 +17,8 @@ import requests
 import json
 import os
 import time
+
+
 
 # init app and cors
 app = Flask(__name__, instance_relative_config=True)
@@ -98,21 +100,26 @@ app.register_blueprint(emails_blueprint)
 
 #===================[Routing]========================
 
-#TODO
-# store the access token in browswer cookie
-
-# when an app.route(...) function is fetched, get the access token from the browswer cookie
-
-# there are two ways to work on the access token
-
-# fetch the api/v1 routes with authorization access token passed, if returned request error, display an alert box
-
 
 API_ROUTE = 'http://127.0.0.1:5000/api/v1/'
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# http://localhost:5000/home - this will be the home page, only accessible for loggedin users
+@app.route('/home')
+def home():
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        return render_template('home.html', email=session['email'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    return render_template('login.html')
 
 @app.route('/login_redirect')
 def login_redirect():
@@ -121,33 +128,55 @@ def login_redirect():
         return redirect(url_for('customer_home'))
     elif role == 'manager':
         return "ok"
-    return "redirecting"
+    return url_for('login')
+
+
+@app.route('/login/logout')
+def logout():
+    # Remove session data, this will log the user out
+    session.pop('loggedin', None)
+    # session.pop('id', None)
+    session.pop('email', None)
+    session.clear()
+    
+    resp = make_response(redirect(url_for('index')))
+    resp.delete_cookie('access_token')
+    resp.delete_cookie('email')
+    resp.delete_cookie('role')
+    resp.delete_cookie('first_name')
+    resp.delete_cookie('last_name')
+    
+    return resp
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    return render_template('register.html')
+
+# ==============[customers]===============
 
 @app.route('/customer/home')
 def customer_home():
     return render_template('customer/home.html')
 
-
-
 @app.route('/customer/car')
 def customer_car():
     car_list = Car.query.all()
-    return render_template('customer/car.html', car_list=car_list)
+    first_name = request.cookies.get('first_name')
+    last_name = request.cookies.get('last_name')
+    return render_template('customer/car.html', car_list=car_list, name= first_name + ' ' + last_name)
 
-
-@app.route('/customer/booking/', methods=['GET'])
-def customer_booking(name):
-   
+@app.route('/customer/booking/', methods=['GET', 'POST'])
+def customer_booking():   
     return render_template('customer/booking.html')
-    # else:
-    #     rent_date = request.form['rent_date']
-    #     return_date = request.form['return_date']
-    #     if datetime.strptime(rent_date, '%Y-%m-%d') > datetime.today() or datetime.strptime(rent_date, '%Y-%m-%d') > datetime.strptime(return_date, '%Y-%m-%d'):
-    #         return render_template('customer/booking.html',msg='Invalid date',email=email, car_name=name)
-    #     else:
-    #         db.session.add(History(email, name, rent_date, return_date))
-    #         db.session.commit()
-    # return redirect(url_for('customer_home'))
+
+from app.models.history import History
+
+@app.route('/customer/history')
+def customer_history():
+    customer_email = request.cookies.get('email')
+    history_list = History.query.filter_by(email=customer_email).all()
+    return render_template('customer/history.html', history_list=history_list)
+
 
 # @app.route('/admin/home')
 # def admin_home():
@@ -203,60 +232,5 @@ def customer_booking(name):
 #                                         ,   car_by_make=json.dumps(car_by_make))
 
 
-@app.route('/login/', methods=['GET'])
-def login():
-    return render_template('login.html')
 
-# http://localhost:5000/login/logout - this will be the logout page
-@app.route('/login/logout')
-def logout():
-    # Remove session data, this will log the user out
-   session.pop('loggedin', None)
-#    session.pop('id', None)
-   session.pop('email', None)
-   # Redirect to login page
-   #  return redirect(url_for('login'))
-   return redirect(url_for('index'))
 
-# http://localhost:5000/register - this will be the registration page, we need to use both GET and POST requests
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    # Output message if something goes wrong...
-    msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'fname' in request.form and 'lname' in request.form and 'password' in request.form and 'email' in request.form and 'birth' in request.form:
-        # Create variables for easy access
-        fname = request.form['fname']
-        lname = request.form['lname']
-        password = request.form['password']
-        email = request.form['email']
-        role = request.form['role']
-        # Check if account exists using db
-        account = User.query.filter_by(email=email).first()
-        # If account exists show error and validation checks
-        if account:
-            msg = 'Account already exists!'
-        elif not re.match(r'[A-Za-z]+', fname) or not re.match(r'[A-Za-z]+', lname):
-            msg = 'Fiest name and last name must contain only characters!'
-        elif not fname or not lname or not password or not email:
-            msg = 'Please fill out the form!'
-        else:
-            db.session.add(User(email, password, fname, lname, role.lower()))
-            db.session.commit()
-            # msg = 'You have successfully registered!'
-            return redirect(url_for('login'))
-    elif request.method == 'POST':
-        # Form is empty... (no POST data)
-        msg = 'Please fill out the form!'
-    # Show registration form with message (if any)
-    return render_template('register.html', msg=msg)
-
-# http://localhost:5000/home - this will be the home page, only accessible for loggedin users
-@app.route('/home')
-def home():
-    # Check if user is loggedin
-    if 'loggedin' in session:
-        # User is loggedin show them the home page
-        return render_template('home.html', email=session['email'])
-    # User is not loggedin redirect to login page
-    return redirect(url_for('login'))
