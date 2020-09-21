@@ -29,6 +29,8 @@ class BaseConfig:
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
     USER_EMAIL_SENDER_EMAIL = "piot2@gmail.com"
     
+    ALLOWED_HOST = ['obscure-lowlands-84107.herokuapp.com', '127.0.0.1']
+    
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
     
