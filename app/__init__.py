@@ -136,6 +136,10 @@ def login_redirect():
         return redirect(url_for('customer_home'))
     elif role == 'admin':
         return redirect(url_for('admin_home'))
+    elif role == 'manager':
+        return redirect(url_for('manager_home'))
+    elif role == 'engineer':
+        return redirect(url_for('engineer_home'))
     return url_for('login')
 
 
