@@ -49,9 +49,12 @@ Customer: customer1@gmail.com
 
 password for all: "password"
 
+### Reports
+
+![git commits](https://github.com/zd247/piot2-car-share/blob/master/2.png)
 
 
-
+![trello board](https://github.com/zd247/piot2-car-share/blob/master/3.png)
 
 
 
