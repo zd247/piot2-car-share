@@ -3,7 +3,9 @@
 ### Project structure
 
 -The project follows the Django-admin for app set up using coverage to perform unit testing in a separate environment, Django-admin provides better solution in managing administrative tasks with command-line utility
+
 -The main server application is stored in /app folder
+
 -The code for Raspberry Pi is stored in the folder Pi
 
 * manage.py: running this file with options to perform administrative tasks
@@ -11,24 +13,34 @@
 1./app : server application
 
 - models: contains all the initialization of the SQAlchemy database models
+
 - apis: contains all blueprint methods
+
 - __init__.py: contain all the initial set up and configurations. Also to store application's routes to display html contents
+
 - config.py: contain the app configuration
+
 - decorator: contain custom jwt role checker
+
 - templates: contain all html resourecs
+
 - static: contain css and javascripts files
 
 2. /tests
 
 - controllers: contains all testing for blueprint apis
+
 - models: contains all testing for SQLAlchemy model
 
 
 ### Username and password of 4 types of users
 
 Admin: admin1@gmail.com
+
 Engineer: engineer1@gmail.com
+
 Manager: manager1@gmail.com
+
 Customer: customer1@gmail.com
 
 
