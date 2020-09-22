@@ -43,7 +43,7 @@ Manager: manager1@gmail.com
 
 Customer: customer1@gmail.com
 
-
+password for all: "password"
 
 
 
