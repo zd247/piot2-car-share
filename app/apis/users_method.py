@@ -6,7 +6,7 @@ from app import db
 from app.decorator import *
 from flask_jwt_extended import jwt_required, get_jwt_claims
 
-users_blueprint = Blueprint('users', __name__, url_prefix="/users")
+users_blueprint = Blueprint('users', __name__, url_prefix="/api/v1/users")
 
 def new_user_dict(self, user):
     return {

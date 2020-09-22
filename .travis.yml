@@ -16,3 +16,9 @@ install:
   - pip install flask-jwt-extended
 # command to run tests
 script: python3 fake_test.py || python fake_test.py
+
+# python3 manage.py create_db
+# python3 manage.py db init
+# python3 manage.py db stamp head
+# python3 manage.py db migrate
+# python3 manage.py db upgrade

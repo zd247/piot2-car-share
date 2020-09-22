@@ -2,7 +2,7 @@ import os
 import datetime
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-postgres_local_base = 'postgresql://postgres:@localhost/'
+postgres_local_base = 'postgresql://postgres:password@localhost:5432/'
 database_name = 'piot2'
 
 
@@ -29,8 +29,24 @@ class BaseConfig:
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
     USER_EMAIL_SENDER_EMAIL = "piot2@gmail.com"
     
+    ALLOWED_HOST = ['obscure-lowlands-84107.herokuapp.com', '127.0.0.1']
+    
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    
+    # # Configure application to store JWTs in cookies. Whenever you make
+    # # a request to a protected endpoint, you will need to send in the
+    # # access or refresh JWT via a cookie.
+    # JWT_TOKEN_LOCATION = ['cookies']
+    
+    # # # Set the cookie paths, so that you are only sending your access token
+    # # # cookie to the access endpoints, and only sending your refresh token
+    # # # to the refresh endpoint.
+    # # JWT_ACCESS_COOKIE_PATH = '/api/'
+    # # JWT_REFRESH_COOKIE_PATH = '/token/refresh'
+    
+    # # This is a bad practice, not suppose to do this.
+    # JWT_COOKIE_CSRF_PROTECT = False
     
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1, seconds=1)
 
@@ -55,4 +71,5 @@ class ProductionConfig(BaseConfig):
     """Production configuration."""
     SECRET_KEY = 'my_precious'
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql:///example'
+    BCRYPT_LOG_ROUNDS = 4
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@/piot2?unix_socket=/cloudsql/piot2790:mysequel'

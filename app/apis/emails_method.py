@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
-emails_blueprint = Blueprint('emails', __name__, url_prefix="/send_email")
+emails_blueprint = Blueprint('emails', __name__, url_prefix="/api/v1/send_email")
 
 class EmailAPI (MethodView):
     @jwt_required

@@ -9,7 +9,7 @@ from tests.base import BaseTestCase
 
 def register_user(self, email, password, first_name, last_name, role=None) :
     return self.client.post(
-        '/auth/register',
+        '/api/v1/auth/register',
         data=json.dumps(dict(
             email=email,
             password=password,
@@ -22,7 +22,7 @@ def register_user(self, email, password, first_name, last_name, role=None) :
 
 def login_user(self, email, password):
     return self.client.post(
-        '/auth/login',
+        '/api/v1/auth/login',
         data=json.dumps(dict(
             email=email,
             password=password
@@ -32,7 +32,7 @@ def login_user(self, email, password):
 
 def logout_user(self, auth_token):
     return self.client.post(
-        '/auth/logout',
+        '/api/v1/auth/logout',
         headers=dict(
             Authorization='Bearer ' + auth_token
         )
@@ -128,7 +128,7 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe", role='engineer')
             response = self.client.get(
-                '/auth/status',
+                '/api/v1/auth/status',
                 headers=dict(
                     Authorization='Bearer ' + json.loads(
                         resp_register.data.decode()
@@ -149,7 +149,7 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             resp_register = register_user(self, 'joe@gmail.com', '123456', "Joe", "Doe")
             response = self.client.get(
-                '/auth/status',
+                '/api/v1/auth/status',
                 headers=dict(
                     Authorization='Bearer' + json.loads(
                         resp_register.data.decode()

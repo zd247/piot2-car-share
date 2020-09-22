@@ -8,7 +8,7 @@ from app.decorator import *
 
 from app import db, gcalendar_service
 
-bookings_blueprint = Blueprint('bookings', __name__, url_prefix="/bookings/<string:car_name>")
+bookings_blueprint = Blueprint('bookings', __name__, url_prefix="/api/v1/bookings/<string:car_name>")
 
 class BookingAPI (MethodView):
     @jwt_required
@@ -127,7 +127,7 @@ class BookingAPI (MethodView):
           
     
     def put (self, car_name, event_id):
-        """ As a current user, create an event from the car's calendar id """ 
+        """ As a current user, edit an event from the car's calendar id """ 
         try:
             put_data = request.get_json()
                 

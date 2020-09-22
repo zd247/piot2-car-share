@@ -16,7 +16,7 @@ class TestDevelopmentConfig(TestCase):
         self.assertTrue(app.config['DEBUG'] is True)
         self.assertFalse(current_app is None)
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://postgres:@localhost/piot2'
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://postgres:password@localhost:5432/piot2'
         )
 
 
@@ -29,7 +29,7 @@ class TestTestingConfig(TestCase):
         self.assertTrue(app.config['SECRET_KEY'] == 'my_precious')
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://postgres:@localhost/piot2_test'
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgresql://postgres:password@localhost:5432/piot2_test'
         )
 
 

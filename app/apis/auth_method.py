@@ -13,10 +13,11 @@ from flask_user import current_user, login_required, roles_required, UserManager
 
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 jwt_required, jwt_refresh_token_required, get_jwt_identity,
+                                set_access_cookies, set_refresh_cookies,
                                 get_jwt_claims, get_raw_jwt)
 
 
-auth_blueprint = Blueprint('auth', __name__, url_prefix="/auth")
+auth_blueprint = Blueprint('auth', __name__, url_prefix="/api/v1/auth")
 
 class RegisterAPI(MethodView):
     """
@@ -62,7 +63,16 @@ class RegisterAPI(MethodView):
                     'role': user.role
                 }
                 
-                return make_response(jsonify(responseObject)), 201
+                response = make_response(jsonify(responseObject))
+                
+                
+                response.set_cookie('role',user.role)
+                response.set_cookie('access_token',access_token, max_age=86400)
+                response.set_cookie('email', str(user.email))
+                response.set_cookie('first_name', str(user.first_name))
+                response.set_cookie('last_name', str(user.last_name))
+                
+                return response, 201
             except Exception as e:
                 responseObject = {
                     'status': 'fail',
@@ -75,9 +85,6 @@ class RegisterAPI(MethodView):
                 'message': 'User already exists. Please Log in.',
             }
             return make_response(jsonify(responseObject)), 500
-
-    def get(self):
-        return "ok"
 
 class LoginAPI(MethodView):
     """
@@ -104,15 +111,22 @@ class LoginAPI(MethodView):
                 access_token = create_access_token(identity=post_data)
                 refresh_token = create_refresh_token(identity=post_data)
                 
-                
                 responseObject = {
                     'status': 'success',
                     'message': 'Successfully logged in.',
                     'auth_token': access_token,
                     'role': user.role
                 }
+                response = make_response(jsonify(responseObject))
                 
-                return make_response(jsonify(responseObject)), 200
+                
+                response.set_cookie('role',user.role)
+                response.set_cookie('access_token',access_token, max_age=86400)
+                response.set_cookie('email', str(user.email))
+                response.set_cookie('first_name', str(user.first_name))
+                response.set_cookie('last_name', str(user.last_name))
+                
+                return response, 200
             else:
                 responseObject = {
                     'status': 'fail',
@@ -183,9 +197,13 @@ class RefreshAPI(MethodView):
     @jwt_refresh_token_required
     def post (self):
         current_user = get_jwt_identity()
+        access_token = create_access_token(identity=current_user)
+        
+        resp = jsonify({'refresh': True})
         ret = {
-            'auth_token': create_access_token(identity=current_user)
+            'auth_token': access_token
         }
+        set_access_cookies(resp, access_token)
         return jsonify(ret), 200
         
     

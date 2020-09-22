@@ -6,7 +6,7 @@ import time
 
 key = 'secret'
 
-HOST = '' # Enter IP or Hostname of your server
+HOST = '10.247.230.60' # Enter IP or Hostname of your server
 PORT = 12345 # Pick an open Port (1000+ recommended), must match the server port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST,PORT))
@@ -56,11 +56,11 @@ def sendMessageTo(message):
 
 #Lets loop awaiting for your input
 while True:
-	lookUpNearbyBluetoothDevices()
+    lookUpNearbyBluetoothDevices()
 
-	encoded = jwt.encode(target_name, key, algorithm='HS256')
-	s.send(encoded)
-	reply = s.recv(1024)
-	reply = jwt.decode(reply, key, algorithms='HS256')
-	sendMessageTo(reply)
-	print('Sent' + reply)
+    encoded = jwt.encode(target_name, key, algorithm='HS256')
+    s.send(encoded)
+    reply = s.recv(1024)
+    reply = jwt.decode(reply, key, algorithms='HS256')
+    sendMessageTo(reply)
+    print('Sent' + reply)

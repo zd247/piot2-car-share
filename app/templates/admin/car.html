@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/sidebar.css') }}"
+/>
+<title>Home Page</title>
+<!--Font Awesome (added because you use icons in your prepend/append)-->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+{% endblock %}
+
+{% block body %}
+<div class="grid-container">
+    <header class="header">
+        <span style="font-size: 30px; cursor: pointer" onclick="openNav()"
+        >&#9776; open</span
+        >
+  </header>
+  <main class="main">
+    <h1><span>Welcome back Admin</span></h1>
+    <br>
+    <div class="grid-container-sm" id="myContainer">
+      <div class="row">
+        <div class="container-sm" style="overflow: auto; height: 25vh">
+          <table id="myTable" class="table table-hover table-bordered">
+            <tr>
+              <th>Name</th>
+              <th>Make</th>
+              <th>Body</th>
+              <th>Colour</th>
+              <th>Seats</th>
+              <th>Location</th>
+              <th>Cost</th>
+              <th>Manu Date</th>
+            </tr>
+            {% for car_info in car_list %}
+            <tr id="{{ car_info.name }}" onmouseover="changeImage(this.id)">
+              <td>{{car_info.name}}</td>
+              <td>{{car_info.make}}</td>
+              <td>{{car_info.body}}</td>
+              <td>{{car_info.colour}}</td>
+              <td>{{car_info.seats}}</td>
+              <td>{{car_info.location}}</td>
+              <td>{{car_info.cost_per_hour}}</td>
+              <td>{{car_info.manu_date}}</td>
+            </tr>
+            {% endfor %}
+
+            
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="mySidenav" class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <a href="{{url_for('admin_home')}}">Home</a>
+      <a href="{{url_for('admin_user')}}">User List</a>
+      <a href="{{url_for('admin_car')}}">Car List</a>
+      <a href="#">Booking History</a>
+      <a href="{{url_for('logout')}}">Logout</a>
+      <!-- <a href="#">Contact</a> -->
+    </div>
+
+    <script>
+      function openNav() {
+        document.getElementById("mySidenav").style.width = "250px";
+        document.body.style.backgroundColor = "rgb(0,0,0,0.4)";
+      }
+
+      function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+        document.body.style.backgroundColor = "white";
+      }
+
+    </script>
+
+    <script
+      type="text/javascript"
+      src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/499416/TweenLite.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/499416/EasePack.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/499416/demo.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{{ url_for('static', filename='js/sort.js') }}"
+    ></script>
+    
+  </main>
+  <footer class="footer">
+    <a>Welcome to Car World</a>
+  </footer>
+</div>
+
+
+{% endblock %}
