@@ -1,5 +1,9 @@
 # piot2-car-share
 
+### Trello link
+
+https://trello.com/b/C8pm96Nv/cosc2790-piot2
+
 ### Project structure
 
 -The project follows the Django-admin for app set up using coverage to perform unit testing in a separate environment, Django-admin provides better solution in managing administrative tasks with command-line utility
