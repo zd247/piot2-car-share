@@ -77,10 +77,10 @@ gcalendar_service = create_service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SC
 # Register email with gmail service
 import smtplib
 
-mail_server = smtplib.SMTP("smtp.gmail.com", 587) 
-mail_server.starttls() # listening to gmail server
-gmail_account = "zduy2407@gmail.com"
-mail_server.login("zduy2407@gmail.com", "Game1468")
+# mail_server = smtplib.SMTP("smtp.gmail.com", 587) 
+# mail_server.starttls() # listening to gmail server
+# gmail_account = "zduy2407@gmail.com"
+# mail_server.login("zduy2407@gmail.com", "Game1468")
 
 
 # register controller blueprints
@@ -88,7 +88,7 @@ from app.apis.auth_method import auth_blueprint
 from app.apis.cars_method import cars_blueprint
 from app.apis.users_method import users_blueprint
 from app.apis.bookings_method import bookings_blueprint
-from app.apis.emails_method import emails_blueprint
+# from app.apis.emails_method import emails_blueprint
 from app.apis.history_method import history_blueprint
 from app.models.car import Car
 from app.models.user import User
@@ -99,7 +99,7 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(cars_blueprint)
 app.register_blueprint(users_blueprint)
 app.register_blueprint(bookings_blueprint)
-app.register_blueprint(emails_blueprint)
+# app.register_blueprint(emails_blueprint)
 app.register_blueprint(history_blueprint)
 
 
