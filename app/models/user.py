@@ -23,33 +23,12 @@ class User(db.Model):
     # roles = db.relationship('Role', secondary='user_roles')
     role  = db.Column(db.String(30), nullable=False, server_default='customer')
 
-    def __init__(self, email, first_name, last_name, role, password="", email_confirmed_at=datetime.datetime.now(), registered_on=datetime.datetime.now(), active=True):
+    def __init__(self, email, password, first_name, last_name, role):
         self.email = email
-        if password == "":
-            self.password = bcrypt.generate_password_hash(
-                password, app.config.get('BCRYPT_LOG_ROUNDS')
-            ).decode()
-        else:
-            self.password = password
+        self.password = bcrypt.generate_password_hash(
+            password, app.config.get('BCRYPT_LOG_ROUNDS')
+        ).decode()
         self.first_name = first_name
         self.last_name = last_name
         self.role = role
-        self.registered_on = registered_on
-        self.active = active
-        self.email_confirmed_at = email_confirmed_at
-
-
-
-# #TODO: DO this when working with more than 5 roles (store them as table and cross reference them)
-# # ============[Define the Role data-model]===============
-# # class Role(db.Model):
-# #     __tablename__ = 'roles'
-# #     id = db.Column(db.Integer(), primary_key=True)
-# #     name = db.Column(db.String(50), unique=True)
-
-# # # ===============[Define the UserRoles association table]==============
-# # class UserRoles(db.Model):
-# #     __tablename__ = 'user_roles'
-# #     id = db.Column(db.Integer(), primary_key=True)
-# #     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
-# #     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+        self.registered_on = datetime.datetime.now()

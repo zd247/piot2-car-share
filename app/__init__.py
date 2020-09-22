@@ -210,7 +210,7 @@ def admin_user():
             User.query.delete()
             for user in json.loads(new_list):
                 db.session.add(User(
-                    user['email'], user['password'], user['first_name'], user['last_name'], user['role'], user['email_confirmed_at'], user['registered_on'], user['active']))
+                    user['email'], user['password'], user['first_name'], user['last_name'], user['role']))
         except exc.SQLAlchemyError as e:
             db.session.rollback()
     db.session.commit()
@@ -228,7 +228,7 @@ def admin_car():
             Car.query.delete()
             for car in json.loads(new_list):
                 db.session.add(Car(car['name'], car['make'], car['body'], car['colour'],
-                                      car['seats'], car['location'], car['cost_per_hour'], car['manu_date'].replace('T', ' '), car['calendar_id'], car['status']))
+                                      car['seats'], car['location'], car['cost_per_hour'], car['manu_date'].replace('T', ' ')))
         except exc.SQLAlchemyError as e:
             db.session.rollback()
     db.session.commit()

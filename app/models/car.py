@@ -17,9 +17,8 @@ class Car(db.Model):
     cost_per_hour = db.Column(db.Float, nullable = False)
     manu_date = db.Column(db.DateTime, nullable = True)
     calendar_id = db.Column(db.String(255), nullable = False, unique=True)
-
     
-    def __init__(self, name, make, body, colour, seats, location, cost_per_hour, manu_date, calendar_id=""):
+    def __init__(self, name, make, body, colour, seats, location, cost_per_hour, manu_date):
         self.name = name
         self.make = make
         self.body = body
@@ -29,15 +28,11 @@ class Car(db.Model):
         self.cost_per_hour = cost_per_hour
         self.manu_date = manu_date
         
-        if calendar_id == "":
         # Calendar
-            calendar_body = {
-                'summary': self.name,
-                'timeZone': datetime.now(tzlocal()).tzname()
-            }
-            created_calendar = gcalendar_service.calendars().insert(body = calendar_body).execute()
-            
-            self.calendar_id = created_calendar['id']
-        else:
-            self.calendar_id = calendar_id
+        calendar_body = {
+            'summary': self.name,
+            'timeZone': datetime.now(tzlocal()).tzname()
+        }
+        created_calendar = gcalendar_service.calendars().insert(body = calendar_body).execute()
         
+        self.calendar_id = created_calendar['id']
