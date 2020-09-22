@@ -23,7 +23,7 @@ class User(db.Model):
     # roles = db.relationship('Role', secondary='user_roles')
     role  = db.Column(db.String(30), nullable=False, server_default='customer')
 
-    def __init__(self, email, first_name, last_name, role, password="", email_confirmed_at=datetime.now(), registered_on=datetime.now(), active=True):
+    def __init__(self, email, first_name, last_name, role, password="", email_confirmed_at=datetime.datetime.now(), registered_on=datetime.datetime.now(), active=True):
         self.email = email
         if password == "":
             self.password = bcrypt.generate_password_hash(

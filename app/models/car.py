@@ -17,7 +17,7 @@ class Car(db.Model):
     cost_per_hour = db.Column(db.Float, nullable = False)
     manu_date = db.Column(db.DateTime, nullable = True)
     calendar_id = db.Column(db.String(255), nullable = False, unique=True)
-    status = Column(db.String(20), nullable = False, CheckConstraint('status="Available" or status="Unavailable"'))
+    status = db.Column(db.String(20), db.CheckConstraint('status="Available" or status="Unavailable"'))
 
     
     def __init__(self, name, make, body, colour, seats, location, cost_per_hour, manu_date, calendar_id="", status="Available"):
